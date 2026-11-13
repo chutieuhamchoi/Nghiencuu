@@ -270,9 +270,13 @@ def main(src, outdir):
         best.append(dict(base, pair=fmt_pair(k), source='; '.join(f'{n} ({c})' for n, c in src_), position_rate=r1(pr),
                          other_pairs=', '.join(''.join(x[1]) for x in cands[1:]), _pairs=cands))
 
-    # Đề xuất 2 cặp: ưu tiên cặp được nhiều cách cùng báo (3 cách, rồi 2 cách), cùng mức thì xếp theo
-    # tỷ lệ về lại của vị trí số gốc; còn thiếu chỗ thì lấy theo cách đang đi lên, trên mức ngẫu nhiên,
-    # ≥10 lần báo/15 ngày, tỷ lệ 15 ngày cao nhất.
+    # Đề xuất 2 cặp, theo thứ tự ưu tiên:
+    #  1) cặp được nhiều cách cùng báo (3 cách, rồi 2 cách); cùng số cách thì cặp có nhiều cách "Đang chạy" hơn,
+    #     rồi đến tỷ lệ về lại của vị trí số gốc;
+    #  2) cặp của cách đơn đang ở trạng thái "Đang chạy" (cách có tỷ lệ 15 ngày cao hơn trước);
+    #  3) còn thiếu thì lấy theo cách đang đi lên, trên mức ngẫu nhiên, ≥10 lần báo/15 ngày.
+    state = {b['method']: b['state'] for b in best}
+    running = {m for m in SINGLE if state.get(NAME[m]) == 'Đang chạy'}
     agree = defaultdict(list)
     for m in SINGLE:
         for k in S[m]:
@@ -283,15 +287,27 @@ def main(src, outdir):
         if len(ms) >= 2:
             src_ = sources(S, '>=2', k)
             pr = sum(prate.get(c, 0) for _, c in src_) / len(src_)
-            multi.append((-len(ms), -pr, k, ms, src_))
+            multi.append((-len(ms), -len(set(ms) & running), -pr, k, ms, src_))
     multi.sort()
     de_xuat = []
-    for nm, _, k, ms, src_ in multi[:2]:
-        de_xuat.append(dict(for_date=for_date, pair=fmt_pair(k), method=f'Trùng {len(ms)} cách ({"+".join(x[1:] for x in ms)})',
+    for _, nrun, _, k, ms, src_ in multi[:2]:
+        de_xuat.append(dict(for_date=for_date, pair=fmt_pair(k),
+                            method=f'Trùng {len(ms)} cách ({"+".join(x[1:] for x in ms)})' + (f', {-nrun} cách đang chạy' if nrun else ''),
                             source_numbers='; '.join(f'{n} ({c})' for n, c in src_[:3]),
                             trend_from=g['rate_15d_before'], trend_to=g['rate_15d'], rate_15d=g['rate_15d'],
                             signals_15d=g['signals_15d'], rate_200=g['rate_200'], signals_200=g['signals_200'],
                             expected=g['expected']))
+    run_best = sorted([b for b in best if b['_pairs'] and b['method'] in {NAME[m] for m in running}],
+                      key=lambda b: -(b['rate_15d'] if b['rate_15d'] != '' else -1))
+    for b in run_best:
+        for pr, k, src_ in b['_pairs']:
+            if len(de_xuat) >= 2 or fmt_pair(k) in {d['pair'] for d in de_xuat}:
+                continue
+            de_xuat.append(dict(for_date=for_date, pair=fmt_pair(k), method=b['method'] + ' (đang chạy)',
+                                source_numbers='; '.join(f'{n} ({c})' for n, c in src_[:1]),
+                                trend_from=b['rate_15d_before'], trend_to=b['rate_15d'], rate_15d=b['rate_15d'],
+                                signals_15d=b['signals_15d'], rate_200=b['rate_200'], signals_200=b['signals_200'],
+                                expected=b['expected']))
     ok = [b for b in best if b['_pairs'] and b['trend'] == 'lên' and b['signals_15d'] >= 10
           and b['rate_15d'] != '' and b['expected'] != '' and b['rate_15d'] > b['expected']]
     ok.sort(key=lambda b: -b['rate_15d'])
