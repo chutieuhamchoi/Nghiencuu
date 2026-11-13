@@ -206,6 +206,41 @@ def main(src, outdir):
                     pos[c][0] += 1; pos[c][1] += hit(k, L)
     prate = {c: 100 * v[1] / v[0] for c, v in pos.items() if v[0]}
 
+    # Trạng thái cầu: chuỗi ngày có báo của mỗi cách, ngày "trúng" khi ít nhất 1 cặp của cách đó về
+    def outcomes(m):
+        return [1 if D[j][m][1] > 0 else 0 for j in range(nD) if D[j][m][0] > 0]
+
+    def state_of(seq):
+        if len(seq) < 3:
+            return 'Chưa đủ dữ liệu'
+        if seq[-2:] == [1, 1]:
+            return 'Đang chạy'
+        if seq[-2:] == [0, 1]:
+            return 'Vừa chạy lại'
+        if seq[-3:] == [1, 1, 0]:
+            return 'Vừa gãy'
+        if seq[-3:] == [0, 0, 0]:
+            return 'Trượt 3 kỳ liền'
+        return 'Vừa trượt'
+
+    STATES = ['Đang chạy', 'Vừa chạy lại', 'Vừa gãy', 'Vừa trượt', 'Trượt 3 kỳ liền']
+    # Chạy thử: tỷ lệ trúng của kỳ báo kế tiếp theo trạng thái cầu, so với tỷ lệ thường của chính cách đó
+    st_rows = []
+    agg = {s_: [0, 0, 0.0] for s_ in STATES}
+    for m in ['C1', 'C2', 'C3', 'C5', 'C6', '>=2']:
+        seq = outcomes(m)
+        if not seq:
+            continue
+        base_rate = sum(seq) / len(seq)
+        for t in range(6, len(seq)):
+            st = state_of(seq[:t])
+            if st in agg:
+                agg[st][0] += 1; agg[st][1] += seq[t]; agg[st][2] += base_rate
+    for s_ in STATES:
+        n, h, e = agg[s_]
+        st_rows.append(dict(state=s_, days=n, hits=h, rate=r1(100 * h / n) if n else '',
+                            base_rate=r1(100 * e / n) if n else '', diff=r1(100 * (h - e) / n) if n else ''))
+
     # Cặp tốt nhất theo từng cách cho kỳ kế tiếp
     last = rows[-1]
     for_date = (date.fromisoformat(last['Ngay']) + timedelta(days=1)).isoformat()
@@ -219,7 +254,8 @@ def main(src, outdir):
         rb = 100 * hb / nb if nb else None
         trend = 'đi ngang' if r15 is None or rb is None or abs(r15 - rb) < 1e-9 else ('lên' if r15 > rb else 'xuống')
         tn = sum(d[m][0] for d in D); th = sum(d[m][1] for d in D); te = sum(d[m][2] for d in D)
-        base = dict(for_date=for_date, method=name, rate_15d=r1(r15), rate_15d_before=r1(rb), trend=trend, signals_15d=n15,
+        seq = outcomes(m)
+        base = dict(for_date=for_date, method=name, state=state_of(seq), last5=''.join('✓' if x else '✗' for x in seq[-5:]), rate_15d=r1(r15), rate_15d_before=r1(rb), trend=trend, signals_15d=n15,
                     rate_200=r1(100 * th / tn) if tn else '', signals_200=tn, expected=r1(100 * te / tn) if tn else '')
         cands = []
         for k in sets[m]:
@@ -285,7 +321,8 @@ def main(src, outdir):
 
     write('series.csv', series, ['date', 'method', 'window', 'rate', 'expected', 'band_low', 'band_high', 'cumulative', 'signals_30d', 'marker'])
     write('summary.csv', summary, list(summary[0].keys()))
-    write('best.csv', best, ['for_date', 'method', 'pair', 'source', 'position_rate', 'other_pairs', 'rate_15d', 'rate_15d_before',
+    write('states.csv', st_rows, ['state', 'days', 'hits', 'rate', 'base_rate', 'diff'])
+    write('best.csv', best, ['for_date', 'method', 'pair', 'source', 'position_rate', 'other_pairs', 'state', 'last5', 'rate_15d', 'rate_15d_before',
                              'trend', 'signals_15d', 'rate_200', 'signals_200', 'expected'])
     write('de_xuat.csv', de_xuat, ['for_date', 'pair', 'method', 'source_numbers', 'trend_from', 'trend_to', 'rate_15d',
                                    'signals_15d', 'rate_200', 'signals_200', 'expected'])
@@ -312,12 +349,16 @@ def main(src, outdir):
         add = [r for r in new if keyf(r) not in have]
         if any(r['for_date'] == for_date for r in old):
             add = []   # đề xuất của kỳ này đã ghi trước đó: giữ nguyên
+            fill = {keyf(r): r for r in new}
+            for r in old:   # chỉ bổ sung cột trạng thái còn trống, không đổi cặp đã ghi
+                if r['for_date'] == for_date and not r.get('state') and keyf(r) in fill:
+                    r['state'] = fill[keyf(r)].get('state', '')
         write(name, add + old, cols)
 
     merge('nhat_ky.csv', ['for_date', 'pair', 'method', 'source_numbers', 'rate_15d', 'expected', 'result', 'came'],
           [dict(d, result='Chờ kết quả', came='') for d in de_xuat], lambda r: (r['for_date'], r['pair']))
-    merge('nhat_ky_cach.csv', ['for_date', 'method', 'pair', 'source', 'result', 'came'],
-          [dict(for_date=for_date, method=b['method'], pair=b['pair'], source='' if b['pair'] == 'Không có' else b['source'],
+    merge('nhat_ky_cach.csv', ['for_date', 'method', 'pair', 'source', 'state', 'result', 'came'],
+          [dict(for_date=for_date, method=b['method'], pair=b['pair'], source='' if b['pair'] == 'Không có' else b['source'], state=b['state'],
                 result='Không báo' if b['pair'] == 'Không có' else 'Chờ kết quả', came='') for b in best],
           lambda r: (r['for_date'], r['method']))
 

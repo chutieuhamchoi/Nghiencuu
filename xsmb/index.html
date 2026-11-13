@@ -81,7 +81,7 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
 <script>
 /* Bộ nạp số liệu: đọc các file CSV trong thư mục data/ và vẽ lại các phần của trang. */
 (function () {
-  const files = { series: 'series.csv', summary: 'summary.csv', best: 'best.csv', de_xuat: 'de_xuat.csv', nhat_ky: 'nhat_ky.csv', nhat_ky_cach: 'nhat_ky_cach.csv' };
+  const files = { series: 'series.csv', summary: 'summary.csv', best: 'best.csv', de_xuat: 'de_xuat.csv', nhat_ky: 'nhat_ky.csv', nhat_ky_cach: 'nhat_ky_cach.csv', states: 'states.csv' };
   const store = {}; const calcs = {}; const draws = {};
   const v = Date.now();
   const dash = {
@@ -191,12 +191,12 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
     <div class="tablewrap">
       <table aria-label="Cặp tốt nhất theo từng cách">
         <thead><tr>
-          <th>Cách</th><th>Cặp</th><th>Số gốc (vị trí)</th><th>Vị trí về lại</th><th>15 ngày</th><th>Hướng</th><th>Lần báo 15 ngày</th><th>Toàn bộ</th><th>Ngẫu nhiên</th><th>Cặp khác</th>
+          <th>Cách</th><th>Cặp</th><th>Trạng thái cầu</th><th>5 kỳ báo gần nhất</th><th>Số gốc (vị trí)</th><th>Vị trí về lại</th><th>15 ngày</th><th>Hướng</th><th>Lần báo 15 ngày</th><th>Toàn bộ</th><th>Ngẫu nhiên</th><th>Cặp khác</th>
         </tr></thead>
         <tbody data-draw="best"></tbody>
       </table>
     </div>
-    <p class="muted">Đơn vị %. "Vị trí về lại" là tỷ lệ AB/BA về hôm sau khi số gốc nằm ở vị trí đó, gộp mọi cách, trên toàn bộ dữ liệu (nhiều số gốc thì lấy trung bình). "Hướng" so tỷ lệ 15 ngày hôm nay với 5 kỳ trước. Dòng có ít lần báo (Cách 4, các tổ hợp cùng báo) dao động mạnh.</p>
+    <p class="muted">Đơn vị %. "Vị trí về lại" là tỷ lệ AB/BA về hôm sau khi số gốc nằm ở vị trí đó, gộp mọi cách, trên toàn bộ dữ liệu (nhiều số gốc thì lấy trung bình). "Hướng" so tỷ lệ 15 ngày hôm nay với 5 kỳ trước. "Trạng thái cầu" xét các kỳ cách đó có báo (✓ là có ít nhất 1 cặp về, ✗ là trượt): Đang chạy = trúng 2 kỳ báo liền; Vừa chạy lại = trượt rồi trúng; Vừa gãy = trúng, trúng rồi trượt; Trượt 3 kỳ liền; còn lại là Vừa trượt. Dòng có ít lần báo (Cách 4, các tổ hợp cùng báo) dao động mạnh.</p>
   </section>
 
   <section class="card" id="so-sanh">
@@ -258,6 +258,26 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
         </table>
       </div>
     </section>
+    <section class="card" id="nk-trang-thai">
+      <h2>Theo trạng thái cầu</h2>
+      <p class="muted">Kiểm tra ý tưởng "cầu gãy rồi chạy lại thì dễ về hơn". Một ngày tính là trúng khi cách đó có ít nhất 1 cặp về; mỗi trạng thái so với tỷ lệ thường của chính cách đó (Cách 1, 2, 3, 5, 6 và Trùng ≥2 cách).</p>
+      <h3 style="margin:0;font-size:var(--cds-font-size-body);font-weight:var(--cds-font-weight-medium)">Từ nhật ký (các kỳ đã ghi trước giờ quay)</h3>
+      <p class="muted">Mỗi cách ghi 1 cặp mỗi ngày, cùng trạng thái cầu lúc ghi; tỷ lệ là số cặp đó có về, so với mức thường khoảng 42% của một cặp. Bắt đầu ghi từ kỳ 14/11/2026.</p>
+      <div class="tablewrap">
+        <table aria-label="Nhật ký theo trạng thái cầu">
+          <thead><tr><th>Trạng thái lúc ghi</th><th>Số cặp đã chấm</th><th>Cặp có về</th><th>Tỷ lệ</th></tr></thead>
+          <tbody data-draw="nk-state"></tbody>
+        </table>
+      </div>
+      <h3 style="margin:0;font-size:var(--cds-font-size-body);font-weight:var(--cds-font-weight-medium)">Chạy thử trên toàn bộ dữ liệu</h3>
+      <div class="tablewrap">
+        <table aria-label="Chạy thử theo trạng thái cầu">
+          <thead><tr><th>Trạng thái cầu</th><th>Số ngày</th><th>Trúng</th><th>Tỷ lệ</th><th>Tỷ lệ thường của cách</th><th>Chênh (điểm)</th></tr></thead>
+          <tbody data-draw="st-bt"></tbody>
+        </table>
+      </div>
+      <p class="muted">Đơn vị %. Trộn ngẫu nhiên thứ tự trúng/trượt vẫn tạo ra mức chênh ±3 điểm khá thường xuyên, nên cần thêm vài tháng nhật ký mới kết luận được.</p>
+    </section>
     <section class="card" id="nk-cach-bang">
       <h2>Nhật ký từng cách theo ngày</h2>
       <div class="controls">
@@ -266,7 +286,7 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
       </div>
       <div class="tablewrap">
         <table aria-label="Nhật ký đề xuất của từng cách">
-          <thead><tr><th>Kỳ</th><th>Cách</th><th>Cặp</th><th>Số gốc (vị trí)</th><th>Kết quả</th><th>Số về</th></tr></thead>
+          <thead><tr><th>Kỳ</th><th>Cách</th><th>Cặp</th><th>Số gốc (vị trí)</th><th>Trạng thái cầu</th><th>Kết quả</th><th>Số về</th></tr></thead>
           <tbody data-draw="nk-cach-rows"></tbody>
         </table>
       </div>
@@ -387,6 +407,7 @@ dash.draw('chart', (box) => {
     .on('pointermove', show).on('pointerdown', show).on('pointerleave', () => { tip.hidden = true; guide.attr('opacity', 0); });
 });
 
+const stCls = (v) => (v === 'Đang chạy' || v === 'Vừa chạy lại' ? 'good' : (v === 'Vừa gãy' || v === 'Trượt 3 kỳ liền' ? 'bad' : ''));
 const fdate = (v) => d3.utcFormat('%d/%m/%Y')(d3.utcParse('%Y-%m-%d')(v));
 dash.draw('dx-date', (el) => {
   const b = dash.data('best');
@@ -418,7 +439,7 @@ dash.draw('best', (tb) => {
   const d = dash.data('best');
   tb.replaceChildren();
   if (d.status !== 'ok') return;
-  const cols = ['method', 'pair', 'source', 'position_rate', 'rate_15d', 'trend', 'signals_15d', 'rate_200', 'expected', 'other_pairs'];
+  const cols = ['method', 'pair', 'state', 'last5', 'source', 'position_rate', 'rate_15d', 'trend', 'signals_15d', 'rate_200', 'expected', 'other_pairs'];
   const pct = new Set(['position_rate', 'rate_15d', 'rate_200', 'expected']);
   d.data.forEach((r) => {
     const tr = document.createElement('tr');
@@ -428,7 +449,9 @@ dash.draw('best', (tb) => {
       td.textContent = v === '' || v == null ? '–' : (pct.has(c) ? String(v).replace('.', ',') : (c === 'trend' ? (v === 'lên' ? '↗ lên' : v === 'xuống' ? '↘ xuống' : '→ ' + v) : v));
       if (c === 'pair') { td.style.fontWeight = '600'; if (v === 'Không có') td.style.color = 'var(--color-fg-muted)'; }
       if (c === 'trend') td.className = v === 'lên' ? 'good' : (v === 'xuống' ? 'bad' : '');
-      if (c === 'source') td.style.textAlign = 'left';
+      if (c === 'source' || c === 'state') td.style.textAlign = 'left';
+      if (c === 'state') td.className = stCls(v);
+      if (c === 'last5') { td.style.letterSpacing = '2px'; td.style.textAlign = 'left'; }
       tr.appendChild(td);
     });
     tb.appendChild(tr);
@@ -543,12 +566,13 @@ dash.draw('nk-cach-rows', (tb) => {
   const pick = window.nkDay();
   d.data.filter((r) => !pick || r.for_date === pick).forEach((r) => {
     const tr = document.createElement('tr');
-    ['for_date', 'method', 'pair', 'source', 'result', 'came'].forEach((c) => {
+    ['for_date', 'method', 'pair', 'source', 'state', 'result', 'came'].forEach((c) => {
       const td = document.createElement('td');
       const v = r[c];
       td.textContent = c === 'for_date' ? fdate(v) : (v === '' || v == null ? '–' : v);
       if (c === 'pair') { td.style.fontWeight = '600'; if (v === 'Không có') { td.style.fontWeight = ''; td.className = 'pending'; } }
-      if (c === 'method' || c === 'source') td.style.textAlign = 'left';
+      if (c === 'method' || c === 'source' || c === 'state') td.style.textAlign = 'left';
+      if (c === 'state') td.className = stCls(v);
       if (c === 'result') td.className = v === 'Trúng' ? 'good' : (v === 'Trượt' ? 'bad' : 'pending');
       tr.appendChild(td);
     });
@@ -561,6 +585,42 @@ dash.draw('nk-ngay', (sel) => {
   sel.replaceChildren(...days.map((v) => new Option(fdate(v) + (v === t ? ' (hôm nay)' : ''), v)), new Option('Tất cả các kỳ', ''));
   sel.value = window.nkDay();
   sel.onchange = () => { window.nkPick = sel.value; dash.draw('nk-cach-rows'); };
+});
+
+dash.draw('st-bt', (tb) => {
+  const d = dash.data('states');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    ['state', 'days', 'hits', 'rate', 'base_rate', 'diff'].forEach((c) => {
+      const td = document.createElement('td'); const v = r[c];
+      td.textContent = v === '' || v == null ? '–' : (c === 'diff' && +v > 0 ? '+' : '') + String(v).replace('.', ',');
+      if (c === 'state') td.className = stCls(v);
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+dash.draw('nk-state', (tb) => {
+  const d = dash.data('nhat_ky_cach');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  const keep = new Set(['Cách 1 · 0AB…', 'Cách 2 · X0AB…', 'Cách 3 · ABBXX', 'Cách 5 · AB/BA lặp ≥2', 'Cách 6 · G7 0AB', 'Trùng ≥2 cách']);
+  const order = ['Đang chạy', 'Vừa chạy lại', 'Vừa gãy', 'Vừa trượt', 'Trượt 3 kỳ liền'];
+  const m = new Map(order.map((s) => [s, [0, 0]]));
+  d.data.forEach((r) => {
+    if (!keep.has(r.method) || !m.has(r.state) || (r.result !== 'Trúng' && r.result !== 'Trượt')) return;
+    const x = m.get(r.state); x[0] += 1; if (r.result === 'Trúng') x[1] += 1;
+  });
+  order.forEach((s) => {
+    const [n, h] = m.get(s);
+    const tr = document.createElement('tr');
+    [s, n, h, n ? String(Math.round((h / n) * 1000) / 10).replace('.', ',') : '–'].forEach((v, i) => {
+      const td = document.createElement('td'); td.textContent = v; if (i === 0) td.className = stCls(s); tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
 });
 </script>
 </body>
