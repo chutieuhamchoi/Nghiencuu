@@ -27,11 +27,11 @@ TREND_LAG = 5
 MIN_N = 3             # số lần báo tối thiểu trong cửa sổ để vẽ điểm
 METHODS = [  # (mã, tên hiển thị)
     ('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
-    ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
+    ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Kép AA'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
     ('1+5', 'Cách 1+5'), ('3+5', 'Cách 3+5'), ('3+4', 'Cách 3+4'), ('RND', 'Đối chứng · 6 cặp ngẫu nhiên/ngày'),
 ]
 BEST = [('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
-        ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('>=2', 'Trùng ≥2 cách'), ('1+5', 'Cách 1+5'),
+        ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Kép AA'), ('>=2', 'Trùng ≥2 cách'), ('1+5', 'Cách 1+5'),
         ('3+5', 'Cách 3+5'), ('3+4', 'Cách 3+4'), ('3|4', 'Cách 3 hoặc 4')]
 NAME = dict(METHODS + BEST)
 SINGLE = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']
@@ -83,6 +83,13 @@ def signals(r):
     db, g1 = r['ĐB'], r['G1']
     if len(db) == 5 and len(g1) == 5 and db[1] == db[3] and g1[2] == db[1]:
         S['C7'][key(db[1], db[2])].append((db + ' + ' + g1, 'ĐB'))
+    # Cách 8 (dự báo kép, không tính vào các tổ hợp trùng): số có dạng AAXXX, XAAXX, AAXX, XAAX hoặc AAX → kép AA
+    S['C8'] = defaultdict(list)
+    for c, n in nums:
+        L = len(n)
+        if (L in (4, 5) and (n[0] == n[1] or n[1] == n[2])) or (L == 3 and n[0] == n[1]):
+            a = n[0] if n[0] == n[1] else n[1]
+            S['C8'][(a, a)].append((n, c))
     return S
 
 
@@ -98,13 +105,14 @@ def method_sets(S, rnd=None):
     sets['3+5'] = sets['C3'] & sets['C5']
     sets['3+4'] = sets['C3'] & sets['C4']
     sets['3|4'] = sets['C3'] | sets['C4']
+    sets['C8'] = set(S['C8'])
     if rnd is not None:
         sets['RND'] = rnd
     return sets
 
 
 def sources(S, m, k):
-    if m in SINGLE:
+    if m in SINGLE or m == 'C8':
         return S[m][k]
     out = []
     for s in SINGLE:
