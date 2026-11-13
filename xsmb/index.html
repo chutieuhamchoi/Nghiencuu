@@ -136,9 +136,9 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
 
   <section class="card" id="de-xuat">
     <h2>Đề xuất cho kỳ <span data-draw="dx-date">—</span></h2>
-    <p class="muted">Xét cả 7 cách đơn và mọi tổ hợp của chúng (cùng báo "1+5", hoặc gộp "3 hoặc 4"). Chỉ giữ cách có tín hiệu từ kỳ hôm qua, đang đi lên trong cửa sổ 15 ngày (so với 5 kỳ trước), đang trên mức ngẫu nhiên và có ít nhất 10 lần báo trong 15 ngày; chọn 2 cặp của cách có tỷ lệ 15 ngày cao nhất.</p>
+    <p class="muted">Ưu tiên cặp được nhiều cách cùng báo từ kỳ hôm qua: 3 cách trước, rồi 2 cách; cùng số cách thì chọn cặp có số gốc ở vị trí giải có tỷ lệ về lại cao hơn. Nếu chưa đủ 2 cặp, lấy thêm từ cách đang đi lên trong cửa sổ 15 ngày (so với 5 kỳ trước), trên mức ngẫu nhiên và có ít nhất 10 lần báo trong 15 ngày. Trên 161 kỳ chạy thử (06/06–13/11), cặp từ 2–3 cách cùng báo trúng 47,1% (104 cặp, ngẫu nhiên 41,7%), cặp lấy thêm trúng 38,6%.</p>
     <div class="pick" data-draw="picks"></div>
-    <p class="muted">"Tỷ lệ hôm nay" là tỷ lệ trúng của cách này trong 15 ngày gần nhất, chỉ dựa trên ít lần báo nên dao động mạnh. Trên toàn bộ dữ liệu, chưa cách nào vượt mức ngẫu nhiên một cách đáng tin; mỗi cặp AB/BA bất kỳ cũng có khoảng 42% khả năng về.</p>
+    <p class="muted">"Tỷ lệ hôm nay" là tỷ lệ trúng của cách (hoặc nhóm trùng ≥2 cách) trong 15 ngày gần nhất, chỉ dựa trên ít lần báo nên dao động mạnh. Trên toàn bộ dữ liệu, chưa cách nào vượt mức ngẫu nhiên một cách đáng tin; mỗi cặp AB/BA bất kỳ cũng có khoảng 42% khả năng về.</p>
   </section>
 
   <section class="card" id="dang-xem">
@@ -407,7 +407,8 @@ dash.draw('picks', (box) => {
     const lab = document.createElement('div'); lab.className = 'muted'; lab.textContent = 'Tỷ lệ hôm nay'; card.appendChild(lab);
     const big = document.createElement('div'); big.className = 'big'; big.append(sp('big', c(r.rate_15d)), '%'); card.appendChild(big);
     const t = document.createElement('div'); t.className = 'muted';
-    t.append('15 ngày: ', sp('', c(r.trend_from)), '% → ', sp('up', c(r.trend_to)), '% ↗ (', sp('', r.signals_15d), ' lần báo)'); card.appendChild(t);
+    const upd = +r.trend_to > +r.trend_from, dn = +r.trend_to < +r.trend_from;
+    t.append((String(r.method).startsWith('Trùng') ? 'Nhóm trùng ≥2 cách, 15 ngày: ' : '15 ngày: '), sp('', c(r.trend_from)), '% → ', sp(upd ? 'up' : (dn ? 'bad' : ''), c(r.trend_to)), '% ' + (upd ? '↗' : (dn ? '↘' : '→')) + ' (', sp('', r.signals_15d), ' lần báo)'); card.appendChild(t);
     const t2 = document.createElement('div'); t2.className = 'muted';
     t2.append('Toàn bộ: ', sp('', c(r.rate_200)), '% (', sp('', r.signals_200), ' lần) · ngẫu nhiên ', sp('', c(r.expected)), '%'); card.appendChild(t2);
     box.appendChild(card);
