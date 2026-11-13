@@ -27,14 +27,14 @@ TREND_LAG = 5
 MIN_N = 3             # số lần báo tối thiểu trong cửa sổ để vẽ điểm
 METHODS = [  # (mã, tên hiển thị)
     ('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
-    ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
+    ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · G1 XABAX + G2 XXAXX'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
     ('1+5', 'Cách 1+5'), ('3+5', 'Cách 3+5'), ('3+4', 'Cách 3+4'), ('RND', 'Đối chứng · 6 cặp ngẫu nhiên/ngày'),
 ]
 BEST = [('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
-        ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('>=2', 'Trùng ≥2 cách'), ('1+5', 'Cách 1+5'),
+        ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · G1 XABAX + G2 XXAXX'), ('>=2', 'Trùng ≥2 cách'), ('1+5', 'Cách 1+5'),
         ('3+5', 'Cách 3+5'), ('3+4', 'Cách 3+4'), ('3|4', 'Cách 3 hoặc 4')]
 NAME = dict(METHODS + BEST)
-SINGLE = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6']
+SINGLE = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']
 
 
 def key(a, b):
@@ -79,6 +79,12 @@ def signals(r):
     for i in range(len(g7) - 2):
         if g7[i] == '0':
             S['C6'][key(g7[i + 1], g7[i + 2])].append((' '.join(r[c] for c in COLS[-4:]), 'G7'))
+    # Cách 7: giải nhất XABAX (chữ số 2 = chữ số 4 = A) và có giải nhì XXAXX (chữ số giữa = A) → AB/BA
+    g1 = r['G1']
+    if len(g1) == 5 and g1[1] == g1[3]:
+        g2 = [r[c] for c in ('G2.1', 'G2.2') if len(r[c]) == 5 and r[c][2] == g1[1]]
+        if g2:
+            S['C7'][key(g1[1], g1[2])].append((g1 + ' + ' + ', '.join(g2), 'G1'))
     return S
 
 
