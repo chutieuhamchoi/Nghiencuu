@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tỷ lệ trúng các cách soi cầu XSMB</title>
+<script src="d3.v7.min.js"></script>
+<style>
+:root {
+  --font-anthropic-sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-anthropic-serif: Georgia, "Times New Roman", serif;
+  --color-bg: #faf9f5; --color-fg: #1f1e1d; --color-fg-muted: #6b6a66; --color-panel: #ffffff;
+  --color-border-line: #e5e3dc; --color-ok: #2e7d4f; --color-bad: #b3412f;
+  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 12px; --cds-gap-lg: 20px;
+  --cds-pad-sm: 6px; --cds-pad-md: 12px; --cds-pad-lg: 18px; --cds-radius: 10px;
+  --cds-font-size-title: 1.9rem; --cds-font-size-heading: 1.15rem; --cds-font-size-body: 1rem; --cds-font-size-caption: .85rem;
+  --cds-font-weight-medium: 600;
+  --cds-text-secondary: #6b6a66; --cds-surface-popover: #ffffff; --cds-border: #d9d6cc; --cds-shadow-popover: 0 4px 14px rgba(0,0,0,.12);
+  --cds-chart-grid: #ece9e1; --cds-chart-axis: #b9b5aa; --cds-chart-muted: #9a968b; --cds-chart-reference: #57544d;
+  --dash-c0: #c2603a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1c1b1a; --color-fg: #eceae4; --color-fg-muted: #a8a59c; --color-panel: #262523;
+    --color-border-line: #3a3936; --color-ok: #6cc08d; --color-bad: #e5806c;
+    --cds-text-secondary: #a8a59c; --cds-surface-popover: #2e2d2a; --cds-border: #45433f;
+    --cds-chart-grid: #34332f; --cds-chart-axis: #5d5b55; --cds-chart-muted: #8d897f; --cds-chart-reference: #c9c5ba;
+    --dash-c0: #e2885f;
+  }
+}
+html, body { margin: 0; background: var(--color-bg); }
+body { padding: 24px 16px 48px; }
+.wrap { max-width: 1100px; margin: 0 auto; }
+select.dash-select { font: inherit; font-size: var(--cds-font-size-body); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--color-border-line); background: var(--color-panel); color: var(--color-fg); }
+.xs { display: flex; flex-direction: column; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+.xs h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.xs h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+.xs p { margin: 0; max-width: 70ch; line-height: 1.55; }
+.xs .muted { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.xs .num { font-variant-numeric: tabular-nums; font-weight: var(--cds-font-weight-medium); }
+.xs .card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-md); min-width: 0; }
+.xs .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--cds-gap-md); }
+.xs .today { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; margin-left: auto; text-align: right; }
+.xs .todaypair { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 2.4rem; line-height: 1.05; color: var(--color-ok); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.xs .todaypair.none { color: var(--color-fg-muted); font-size: 1.4rem; }
+.xs .warn { color: var(--color-bad); font-weight: var(--cds-font-weight-medium); border: 1px solid var(--color-bad); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); max-width: none; }
+.xs .controls { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); align-items: center; }
+.xs .controls label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.xs .chartbox { position: relative; min-height: 320px; }
+.xs .chartbox svg text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); }
+.xs .tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); font-size: var(--cds-font-size-caption); line-height: 1.5; white-space: nowrap; }
+.xs .legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--cds-text-secondary); }
+.xs .legend span { display: inline-flex; align-items: center; gap: 6px; }
+.xs .sw { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.xs .swb { width: 14px; height: 10px; border-radius: 2px; display: inline-block; background: var(--cds-chart-muted); opacity: .35; }
+.xs .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.xs .tablewrap { overflow-x: auto; }
+.xs table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.xs th, .xs td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.xs th:first-child, .xs td:first-child { text-align: left; }
+.xs th { color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.xs tr.sel td { background: color-mix(in srgb, var(--color-fg) 6%, transparent); }
+.xs .good { color: var(--color-ok); } .xs .bad { color: var(--color-bad); }
+.xs details summary { cursor: pointer; font-weight: var(--cds-font-weight-medium); }
+.xs details p { margin-top: var(--cds-gap-sm); }
+.xs .pick { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--cds-gap-md); }
+.xs .pk { border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: flex; flex-direction: column; gap: var(--cds-gap-xs); min-width: 0; }
+.xs .pk .pair { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 2.2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.xs .pk .big { font-family: var(--font-anthropic-serif); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.xs .up { color: var(--color-ok); }
+.xs .tabs { display: flex; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); flex-wrap: wrap; }
+.xs .tab { font: inherit; font-size: var(--cds-font-size-body); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--color-fg-muted); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; margin-bottom: -1px; }
+.xs .tab[aria-selected=true] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.xs .tabpanel { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.xs .tabpanel[hidden] { display: none; }
+.xs .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--cds-gap-md); }
+.xs .kpi { border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+.xs .kpi .big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 1.8rem; font-variant-numeric: tabular-nums; }
+.xs td.pending { color: var(--color-fg-muted); }
+</style>
+<script>
+/* Bộ nạp số liệu: đọc các file CSV trong thư mục data/ và vẽ lại các phần của trang. */
+(function () {
+  const files = { series: 'series.csv', summary: 'summary.csv', best: 'best.csv', de_xuat: 'de_xuat.csv', nhat_ky: 'nhat_ky.csv', nhat_ky_cach: 'nhat_ky_cach.csv' };
+  const store = {}; const calcs = {}; const draws = {};
+  const v = Date.now();
+  const dash = {
+    colors: [getComputedStyle(document.documentElement).getPropertyValue('--dash-c0').trim() || '#c2603a'],
+    data(id) {
+      if (calcs[id]) {
+        const c = calcs[id];
+        if (c.inputs.some((i) => !store[i] || store[i].status !== 'ok')) return { status: 'loading', data: null };
+        return { status: 'ok', data: c.fn(...c.inputs.map((i) => store[i].data)) };
+      }
+      return store[id] || { status: 'loading', data: [] };
+    },
+    calc(id, spec) { calcs[id] = spec; },
+    draw(name, fn) {
+      if (fn) draws[name] = fn;
+      const f = draws[name]; if (!f) return;
+      document.querySelectorAll('[data-draw="' + name + '"]').forEach((el) => { try { f(el); } catch (e) { console.error(name, e); } });
+    },
+    drawAll() { Object.keys(draws).forEach((n) => dash.draw(n)); },
+    setLink(id) { history.replaceState(null, '', '#' + id); },
+  };
+  window.dash = dash;
+  window.addEventListener('DOMContentLoaded', () => {
+    Object.entries(files).forEach(([id, f]) => {
+      store[id] = { status: 'loading', data: [] };
+      d3.csv('data/' + f + '?v=' + v).then((rows) => { store[id] = { status: 'ok', data: rows }; dash.drawAll(); })
+        .catch(() => { store[id] = { status: 'error', data: [] }; dash.drawAll(); });
+    });
+    d3.json('data/meta.json?v=' + v).then((m) => {
+      document.querySelectorAll('[data-meta]').forEach((el) => { el.textContent = m[el.getAttribute('data-meta')]; });
+    }).catch(() => {});
+    let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => dash.draw('chart'), 150); });
+  });
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+<div class="xs" lang="vi">
+  <p class="warn" id="canh-bao" role="note">Đánh Lô là vi phạm pháp luật, Trang web chỉ cung cấp số liệu phục vụ NCKH về XSTK</p>
+  <header id="tieu-de" style="display:flex;flex-direction:column;gap:var(--cds-gap-sm)">
+    <h1>Tỷ lệ trúng các cách soi cầu XSMB theo thời gian</h1>
+    <p>Mỗi điểm trên biểu đồ là tỷ lệ trúng AB/BA ở kỳ hôm sau, tính trên một cửa sổ trượt (15, 30 hoặc 60 ngày gần nhất), từ <span data-meta="draws">—</span> kỳ quay <span data-meta="first">—</span>–<span data-meta="last">—</span>. Dải xám là vùng mà một cách chọn hoàn toàn ngẫu nhiên vẫn thường rơi vào (95%).</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Chọn trang">
+    <button class="tab" role="tab" id="tab-tong-quan" aria-controls="tong-quan" aria-selected="true" data-tab="tong-quan">Tổng quan</button>
+    <button class="tab" role="tab" id="tab-nhat-ky" aria-controls="nhat-ky" aria-selected="false" data-tab="nhat-ky">Nhật ký đề xuất</button>
+  </div>
+
+  <div class="tabpanel" id="tong-quan" role="tabpanel" aria-labelledby="tab-tong-quan">
+
+  <section class="card" id="de-xuat">
+    <h2>Đề xuất cho kỳ <span data-draw="dx-date">—</span></h2>
+    <p class="muted">Xét cả 6 cách đơn và mọi tổ hợp của chúng (cùng báo "1+5", hoặc gộp "3 hoặc 4"). Chỉ giữ cách có tín hiệu từ kỳ hôm qua, đang đi lên trong cửa sổ 15 ngày (so với 5 kỳ trước), đang trên mức ngẫu nhiên và có ít nhất 10 lần báo trong 15 ngày; chọn 2 cặp của cách có tỷ lệ 15 ngày cao nhất.</p>
+    <div class="pick" data-draw="picks"></div>
+    <p class="muted">"Tỷ lệ hôm nay" là tỷ lệ trúng của cách này trong 15 ngày gần nhất, chỉ dựa trên ít lần báo nên dao động mạnh. Trên toàn bộ dữ liệu, chưa cách nào vượt mức ngẫu nhiên một cách đáng tin; mỗi cặp AB/BA bất kỳ cũng có khoảng 42% khả năng về.</p>
+  </section>
+
+  <section class="card" id="dang-xem">
+    <div class="topbar">
+    <div class="controls">
+      <label for="chon-cach">Cách đang xem</label>
+      <select class="dash-select" id="chon-cach" aria-label="Chọn cách soi cầu">
+        <option value="Trùng ≥2 cách">Trùng ≥2 cách</option>
+        <option value="Cách 1 · 0AB…">Cách 1 · 0AB…</option>
+        <option value="Cách 2 · X0AB…">Cách 2 · X0AB…</option>
+        <option value="Cách 3 · ABBXX">Cách 3 · ABBXX</option>
+        <option value="Cách 4 · ABBB…">Cách 4 · ABBB…</option>
+        <option value="Cách 5 · AB/BA lặp ≥2">Cách 5 · AB/BA lặp ≥2</option>
+        <option value="Cách 6 · G7 0AB">Cách 6 · G7 0AB</option>
+        <option value="Trùng ≥3 cách">Trùng ≥3 cách</option>
+        <option value="Cách 1+5">Cách 1+5</option>
+        <option value="Cách 3+5">Cách 3+5</option>
+        <option value="Cách 3+4">Cách 3+4</option>
+        <option value="Đối chứng · 6 cặp ngẫu nhiên/ngày">Đối chứng · 6 cặp ngẫu nhiên/ngày</option>
+      </select>
+      <label for="chon-cua-so">Cửa sổ</label>
+      <select class="dash-select" id="chon-cua-so" aria-label="Chọn độ dài cửa sổ">
+        <option value="15">15 ngày</option>
+        <option value="30">30 ngày</option>
+        <option value="60">60 ngày</option>
+      </select>
+    </div>
+    <div class="today" id="cap-hom-nay">
+      <span class="muted">Cặp hôm nay của cách này</span>
+      <span class="todaypair" data-draw="today-pair">—</span>
+    </div>
+    </div>
+    <p>Toàn bộ dữ liệu: trúng <span class="num" data-draw="s-rate">—</span>% so với mức ngẫu nhiên <span class="num" data-draw="s-exp">—</span>%, trên <span class="num" data-draw="s-n">—</span> lần có tín hiệu. Biểu đồ có <span class="num" data-draw="s-peaks">—</span> đỉnh và <span class="num" data-draw="s-troughs">—</span> đáy, hai đỉnh liền nhau cách trung bình <span class="num" data-draw="s-gap">—</span> ngày (ngắn nhất <span class="num" data-draw="s-gmin">—</span>, dài nhất <span class="num" data-draw="s-gmax">—</span>). Trong 30 ngày sau mỗi đỉnh, cách này trúng <span class="num" data-draw="s-ap">—</span>%; sau mỗi đáy, trúng <span class="num" data-draw="s-at">—</span>%.</p>
+    <div class="legend" aria-hidden="true">
+      <span><i class="sw" style="background:var(--dash-c0)"></i>Tỷ lệ trúng trong cửa sổ</span>
+      <span><i class="sw" style="background:var(--cds-chart-reference);height:2px"></i>Mức ngẫu nhiên</span>
+      <span><i class="swb"></i>Vùng dao động ngẫu nhiên 95%</span>
+      <span><i class="sw" style="background:var(--cds-chart-muted)"></i>Tỷ lệ cộng dồn</span>
+      <span><i class="dot" style="background:var(--color-ok)"></i>Đỉnh</span>
+      <span><i class="dot" style="background:var(--color-bad)"></i>Đáy</span>
+    </div>
+    <div class="chartbox" id="bieu-do" data-draw="chart"></div>
+    <p class="muted">Đỉnh là điểm cao nhất trong khoảng ±7 ngày và nằm trên mức ngẫu nhiên; đáy là điểm thấp nhất và nằm dưới. Một đỉnh hay đáy chỉ xác nhận được sau 7 ngày, nên phần "sau đỉnh/đáy" tính từ ngày thứ 8 đến ngày thứ 37. Vì đỉnh được định nghĩa trong ±7 ngày, hai đỉnh liền nhau không thể cách nhau dưới khoảng 8 ngày ở mọi cửa sổ. Chỉ vẽ những ngày cửa sổ có từ 3 lần báo trở lên.</p>
+  </section>
+
+  <section class="card" id="cap-theo-cach">
+    <h2>Cặp tốt nhất theo từng cách</h2>
+    <p class="muted">Mỗi cách lấy 1 cặp từ tín hiệu của kỳ hôm qua. Khi một cách báo nhiều cặp, chọn cặp có số gốc nằm ở vị trí giải có tỷ lệ về lại cao nhất trên toàn bộ dữ liệu. Cách không có số khớp hôm qua ghi "Không có".</p>
+    <div class="tablewrap">
+      <table aria-label="Cặp tốt nhất theo từng cách">
+        <thead><tr>
+          <th>Cách</th><th>Cặp</th><th>Số gốc (vị trí)</th><th>Vị trí về lại</th><th>15 ngày</th><th>Hướng</th><th>Lần báo 15 ngày</th><th>Toàn bộ</th><th>Ngẫu nhiên</th><th>Cặp khác</th>
+        </tr></thead>
+        <tbody data-draw="best"></tbody>
+      </table>
+    </div>
+    <p class="muted">Đơn vị %. "Vị trí về lại" là tỷ lệ AB/BA về hôm sau khi số gốc nằm ở vị trí đó, gộp mọi cách, trên toàn bộ dữ liệu (nhiều số gốc thì lấy trung bình). "Hướng" so tỷ lệ 15 ngày hôm nay với 5 kỳ trước. Dòng có ít lần báo (Cách 4, các tổ hợp cùng báo) dao động mạnh.</p>
+  </section>
+
+  <section class="card" id="so-sanh">
+    <h2>Khoảng cách giữa các đỉnh, và tỷ lệ trúng sau đỉnh, sau đáy</h2>
+    <p class="muted">Nếu tỷ lệ trúng có chu kỳ, cột "Sau đáy" phải cao hơn hẳn cột "Sau đỉnh". Nếu có chu kỳ thật, khoảng cách giữa hai đỉnh phải gần như cố định. Dòng đối chứng là 6 cặp bốc ngẫu nhiên mỗi ngày, để thấy may rủi một mình cũng tạo ra đỉnh, đáy và "chu kỳ". Bảng theo cửa sổ đang chọn ở trên.</p>
+    <div class="tablewrap">
+      <table aria-label="So sánh các cách">
+        <thead><tr>
+          <th>Cách</th><th>Lần báo</th><th>Trúng</th><th>Ngẫu nhiên</th><th>Đỉnh cao nhất</th><th>Đáy thấp nhất</th><th>Số đỉnh</th><th>Số đáy</th><th>Đỉnh→đỉnh TB (ngày)</th><th>Ngắn nhất</th><th>Dài nhất</th><th>Sau đỉnh</th><th>Sau đáy</th>
+        </tr></thead>
+        <tbody data-draw="table"></tbody>
+      </table>
+    </div>
+    <p class="muted">Đơn vị là % số lần báo có AB hoặc BA về ở kỳ hôm sau. Mức ngẫu nhiên ≈ 42% với dàn 2 con, ≈ 24% với dàn kép. Các dòng có ít lần báo (Cách 4, Trùng ≥3, 3+4) dao động rất mạnh và không nên đọc đỉnh/đáy của chúng.</p>
+  </section>
+
+  </div>
+
+  <div class="tabpanel" id="nhat-ky" role="tabpanel" aria-labelledby="tab-nhat-ky" hidden>
+    <section class="card" id="nk-tong">
+      <h2>Kết quả các đề xuất đã chấm</h2>
+      <p class="muted">Mỗi ngày trang đề xuất 2 cặp AB/BA (4 con) cho kỳ hôm sau. Có hai cách tính tỷ lệ, mỗi cách so với mức ngẫu nhiên của chính nó. Chỉ tính các kỳ đã có kết quả.</p>
+      <h3 style="margin:0;font-size:var(--cds-font-size-body);font-weight:var(--cds-font-weight-medium)">Tính theo từng con số</h3>
+      <p class="muted">Mỗi con trong cặp tính riêng: con nào về ít nhất 1 nháy là trúng. Một con bất kỳ có khoảng 23,8% khả năng về.</p>
+      <div class="kpis">
+        <div class="kpi"><span class="muted">Số con đã chấm</span><span class="big" data-draw="nk-cn">—</span></div>
+        <div class="kpi"><span class="muted">Số con về</span><span class="big" data-draw="nk-ch">—</span></div>
+        <div class="kpi"><span class="muted">Tỷ lệ theo con</span><span class="big"><span data-draw="nk-cr">—</span>%</span></div>
+        <div class="kpi"><span class="muted">Mức ngẫu nhiên theo con</span><span class="big"><span data-draw="nk-ce">—</span>%</span></div>
+      </div>
+      <h3 style="margin:0;font-size:var(--cds-font-size-body);font-weight:var(--cds-font-weight-medium)">Tính theo cặp AB/BA</h3>
+      <p class="muted">Cặp nào có AB hoặc BA về ít nhất 1 nháy thì tính là trúng. Một cặp bất kỳ có khoảng 42% khả năng về, vì mỗi cặp gồm 2 con.</p>
+      <div class="kpis">
+        <div class="kpi"><span class="muted">Số cặp đã chấm</span><span class="big" data-draw="nk-n">—</span></div>
+        <div class="kpi"><span class="muted">Số cặp có về</span><span class="big" data-draw="nk-h">—</span></div>
+        <div class="kpi"><span class="muted">Tỷ lệ theo cặp</span><span class="big"><span data-draw="nk-r">—</span>%</span></div>
+        <div class="kpi"><span class="muted">Mức ngẫu nhiên theo cặp</span><span class="big"><span data-draw="nk-e">—</span>%</span></div>
+        <div class="kpi"><span class="muted">Đang chờ kết quả</span><span class="big" data-draw="nk-p">—</span></div>
+      </div>
+      <p class="muted">Với ít ngày dữ liệu, tỷ lệ trúng dao động rất mạnh. Cần khoảng 100 cặp đã chấm (khoảng 2 tháng) thì mới so được với mức ngẫu nhiên một cách đáng tin.</p>
+    </section>
+    <section class="card" id="nk-bang">
+      <h2>Nhật ký từng ngày</h2>
+      <div class="tablewrap">
+        <table aria-label="Nhật ký đề xuất">
+          <thead><tr><th>Kỳ</th><th>Cặp đề xuất</th><th>Theo cách</th><th>Số gốc</th><th>Tỷ lệ 15 ngày lúc đề xuất</th><th>Kết quả</th><th>Số về</th></tr></thead>
+          <tbody data-draw="nk-rows"></tbody>
+        </table>
+      </div>
+      <p class="muted">Đơn vị %. Đề xuất được ghi trước khi có kết quả kỳ đó, để không thể chọn lại sau khi biết số.</p>
+    </section>
+    <section class="card" id="nk-cach-tong">
+      <h2>Theo từng cách</h2>
+      <p class="muted">Mỗi ngày, mỗi cách ghi 1 cặp (cặp đứng đầu trong bảng "Cặp tốt nhất theo từng cách"). Ngày cách đó không có số khớp thì ghi "Không báo" và không tính. Tỷ lệ theo con so với mức ngẫu nhiên 23,8%; tỷ lệ theo cặp so với khoảng 42%.</p>
+      <div class="tablewrap">
+        <table aria-label="Tổng hợp nhật ký theo từng cách">
+          <thead><tr><th>Cách</th><th>Số ngày đã chấm</th><th>Số ngày không báo</th><th>Cặp có về</th><th>Theo cặp</th><th>Số con</th><th>Con về</th><th>Theo con</th></tr></thead>
+          <tbody data-draw="nk-cach-sum"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="card" id="nk-cach-bang">
+      <h2>Nhật ký từng cách theo ngày</h2>
+      <div class="controls">
+        <label for="loc-ngay">Kỳ</label>
+        <select class="dash-select" id="loc-ngay" data-draw="nk-ngay" aria-label="Lọc theo kỳ"></select>
+      </div>
+      <div class="tablewrap">
+        <table aria-label="Nhật ký đề xuất của từng cách">
+          <thead><tr><th>Kỳ</th><th>Cách</th><th>Cặp</th><th>Số gốc (vị trí)</th><th>Kết quả</th><th>Số về</th></tr></thead>
+          <tbody data-draw="nk-cach-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <details id="cach-tinh">
+    <summary>Cách tính và nguồn số liệu</summary>
+    <p>Nguồn: xskt.com.vn. Các kỳ từ 22/08/2026 trở đi đã đối chiếu khớp 100% với bảng đầu–đuôi; các kỳ 26/04–21/08 trích từ trang 200 ngày, chưa đối chiếu từng kỳ. Cách 1: số 4–5 chữ số bắt đầu bằng 0 (0AB…). Cách 2: số 5 chữ số có chữ số thứ hai là 0 (X0AB…). Cách 3: số 5 chữ số dạng ABBXX, A≠B. Cách 4: số dạng ABBB…, A≠B. Cách 5: từ 2 số 4–5 chữ số trở lên trong cùng kỳ mở đầu bằng AB hoặc BA. Cách 6: viết 4 số giải 7 liền nhau thành dãy 8 chữ số, mỗi chỗ có dạng 0AB (số 0 rồi hai chữ số kế tiếp) báo cặp AB/BA. Các tổ hợp "Trùng ≥2 cách" và "Trùng ≥3 cách" đã tính cả Cách 6. "Trúng" là AB hoặc BA về ít nhất 1 nháy ở kỳ ngay sau. Vùng 95% là mức ngẫu nhiên ± 1,96 độ lệch chuẩn theo số lần báo trong cửa sổ đang chọn. Số liệu được tính lại tự động mỗi tối sau giờ quay; mã tính toán: <code>xsmb_analysis.py</code> trong cùng thư mục.</p>
+  </details>
+</div>
+</div>
+
+<script>
+window.xsSel = 'Trùng ≥2 cách';
+window.xsWin = '30';
+window.xsDraws = ['today-pair', 'chart', 'table', 's-rate', 's-exp', 's-n', 's-peaks', 's-troughs', 's-ap', 's-at', 's-gap', 's-gmin', 's-gmax'];
+document.querySelectorAll('#chon-cach').forEach((s) => {
+  s.value = window.xsSel;
+  s.addEventListener('change', () => { window.xsSel = s.value; window.xsDraws.forEach((n) => dash.draw(n)); });
+});
+document.querySelectorAll('#chon-cua-so').forEach((s) => {
+  s.value = window.xsWin;
+  s.addEventListener('change', () => { window.xsWin = s.value; window.xsDraws.forEach((n) => dash.draw(n)); });
+});
+window.xsRow = () => {
+  const s = dash.data('summary');
+  if (s.status !== 'ok') return null;
+  return s.data.find((r) => r.method === window.xsSel && String(r.window) === window.xsWin) || null;
+};
+const fmt = (v) => (v === null || v === undefined || v === '' ? '–' : String(v).replace('.', ','));
+[['s-rate', 'rate'], ['s-exp', 'expected'], ['s-n', 'signals'], ['s-peaks', 'peaks'], ['s-troughs', 'troughs'], ['s-ap', 'rate_after_peak'], ['s-at', 'rate_after_trough'], ['s-gap', 'avg_peak_gap'], ['s-gmin', 'min_peak_gap'], ['s-gmax', 'max_peak_gap']].forEach(([name, field]) => {
+  dash.draw(name, (el) => {
+    const r = window.xsRow();
+    el.textContent = r ? fmt(r[field]) : '—';
+  });
+});
+
+dash.draw('table', (tb) => {
+  const s = dash.data('summary');
+  tb.replaceChildren();
+  if (s.status !== 'ok') return;
+  const cols = ['method', 'signals', 'rate', 'expected', 'roll_max', 'roll_min', 'peaks', 'troughs', 'avg_peak_gap', 'min_peak_gap', 'max_peak_gap', 'rate_after_peak', 'rate_after_trough'];
+  s.data.filter((r) => String(r.window) === window.xsWin).forEach((r) => {
+    const tr = document.createElement('tr');
+    if (r.method === window.xsSel) tr.className = 'sel';
+    cols.forEach((c) => {
+      const td = document.createElement('td');
+      const v = r[c];
+      td.textContent = c === 'method' ? v : (v === '' || v == null ? '–' : String(v).replace('.', ','));
+      if ((c === 'rate_after_peak' || c === 'rate_after_trough' || c === 'rate') && v !== '' && v != null) {
+        const d = +v - +r.expected;
+        if (d >= 5) td.className = 'good';
+        else if (d <= -5) td.className = 'bad';
+      }
+      tr.appendChild(td);
+    });
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', () => {
+      window.xsSel = r.method;
+      document.querySelectorAll('#chon-cach').forEach((sel) => { sel.value = r.method; });
+      window.xsDraws.forEach((n) => dash.draw(n));
+    });
+    tb.appendChild(tr);
+  });
+});
+
+dash.draw('chart', (box) => {
+  const d = dash.data('series');
+  box.replaceChildren();
+  if (d.status === 'error') { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Không tải được số liệu.'; box.appendChild(p); return; }
+  if (d.status !== 'ok') { box.textContent = '—'; return; }
+  const parse = d3.utcParse('%Y-%m-%d');
+  const rows = d.data.filter((r) => r.method === window.xsSel && String(r.window) === window.xsWin).map((r) => ({
+    date: parse(r.date), rate: +r.rate, exp: +r.expected, lo: +r.band_low, hi: +r.band_high, cum: +r.cumulative, n: +r.signals_30d, marker: r.marker
+  }));
+  if (!rows.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Cách này có quá ít lần báo để vẽ.'; box.appendChild(p); return; }
+  const W = Math.max(280, box.clientWidth), H = W < 520 ? 260 : 320;
+  const m = { t: 12, r: 14, b: 28, l: 40 };
+  const x = d3.scaleUtc().domain(d3.extent(rows, (r) => r.date)).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain([0, Math.min(100, Math.max(70, d3.max(rows, (r) => Math.max(r.rate, r.hi)) + 5))]).nice().range([H - m.b, m.t]);
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+    .attr('aria-label', `Tỷ lệ trúng cửa sổ ${window.xsWin} ngày của ${window.xsSel} so với mức ngẫu nhiên`);
+  svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat((v) => v + '%'))
+    .call((g) => { g.select('.domain').remove(); g.selectAll('line').attr('stroke', 'var(--cds-chart-grid)'); });
+  const months = d3.utcMonth.range(d3.utcMonth.ceil(x.domain()[0]), x.domain()[1]);
+  svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickValues(months).tickFormat(d3.utcFormat('T%-m')).tickSizeOuter(0))
+    .call((g) => g.selectAll('line,path').attr('stroke', 'var(--cds-chart-axis)'));
+  svg.append('path').datum(rows).attr('fill', 'var(--cds-chart-muted)').attr('opacity', 0.25)
+    .attr('d', d3.area().x((r) => x(r.date)).y0((r) => y(r.lo)).y1((r) => y(r.hi)).curve(d3.curveLinear));
+  svg.append('path').datum(rows).attr('fill', 'none').attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 3').attr('stroke-width', 1.5)
+    .attr('d', d3.line().x((r) => x(r.date)).y((r) => y(r.exp)));
+  svg.append('path').datum(rows).attr('fill', 'none').attr('stroke', 'var(--cds-chart-muted)').attr('stroke-width', 1.5)
+    .attr('d', d3.line().x((r) => x(r.date)).y((r) => y(r.cum)));
+  svg.append('path').datum(rows).attr('fill', 'none').style('stroke', dash.colors[0]).attr('stroke-width', 2)
+    .attr('d', d3.line().x((r) => x(r.date)).y((r) => y(r.rate)));
+  svg.append('g').selectAll('circle').data(rows.filter((r) => r.marker)).join('circle')
+    .attr('cx', (r) => x(r.date)).attr('cy', (r) => y(r.rate)).attr('r', 4.5)
+    .attr('fill', (r) => (r.marker === 'Đỉnh' ? 'var(--color-ok)' : 'var(--color-bad)')).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5);
+  const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; box.appendChild(tip);
+  const guide = svg.append('line').attr('y1', m.t).attr('y2', H - m.b).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
+  const f = d3.utcFormat('%d/%m/%Y'), c = (v) => String(v).replace('.', ',');
+  const bis = d3.bisector((r) => r.date).center;
+  const show = (ev) => {
+    const [px] = d3.pointer(ev, svg.node());
+    const sx = px * (W / svg.node().getBoundingClientRect().width);
+    const r = rows[bis(rows, x.invert(sx))]; if (!r) return;
+    guide.attr('x1', x(r.date)).attr('x2', x(r.date)).attr('opacity', 1);
+    tip.replaceChildren();
+    [[f(r.date) + (r.marker ? ' · ' + r.marker : ''), true], ['Trúng ' + window.xsWin + ' ngày: ' + c(r.rate) + '% (' + r.n + ' lần báo)'], ['Ngẫu nhiên: ' + c(r.exp) + '% (vùng ' + c(r.lo) + '–' + c(r.hi) + '%)'], ['Cộng dồn: ' + c(r.cum) + '%']]
+      .forEach(([t, b]) => { const dv = document.createElement('div'); dv.textContent = t; if (b) dv.style.fontWeight = '600'; tip.appendChild(dv); });
+    tip.hidden = false;
+    const bw = box.clientWidth, left = x(r.date) * (bw / W);
+    tip.style.top = '8px';
+    tip.style.left = Math.max(0, Math.min(bw - tip.offsetWidth, left + 12 > bw - tip.offsetWidth ? left - tip.offsetWidth - 12 : left + 12)) + 'px';
+  };
+  svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+    .on('pointermove', show).on('pointerdown', show).on('pointerleave', () => { tip.hidden = true; guide.attr('opacity', 0); });
+});
+
+const fdate = (v) => d3.utcFormat('%d/%m/%Y')(d3.utcParse('%Y-%m-%d')(v));
+dash.draw('dx-date', (el) => {
+  const b = dash.data('best');
+  if (b.status !== 'ok' || !b.data.length) { el.textContent = '—'; return; }
+  el.textContent = fdate(b.data[0].for_date);
+});
+dash.draw('picks', (box) => {
+  const d = dash.data('de_xuat');
+  box.replaceChildren();
+  if (d.status !== 'ok') { box.textContent = '—'; return; }
+  if (!d.data.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Hôm nay không có cách nào đạt đủ các điều kiện trên, nên không có đề xuất.'; box.appendChild(p); return; }
+  const c = (v) => String(v).replace('.', ',');
+  const sp = (cls, text) => { const e = document.createElement('span'); if (cls) e.className = cls; e.textContent = text; return e; };
+  d.data.forEach((r) => {
+    const card = document.createElement('div'); card.className = 'pk';
+    const pair = document.createElement('div'); pair.className = 'pair'; pair.textContent = r.pair; card.appendChild(pair);
+    const by = document.createElement('div'); by.className = 'muted'; by.append('Theo ', sp('', r.method), ' · số gốc ', sp('', r.source_numbers)); card.appendChild(by);
+    const lab = document.createElement('div'); lab.className = 'muted'; lab.textContent = 'Tỷ lệ hôm nay'; card.appendChild(lab);
+    const big = document.createElement('div'); big.className = 'big'; big.append(sp('big', c(r.rate_15d)), '%'); card.appendChild(big);
+    const t = document.createElement('div'); t.className = 'muted';
+    t.append('15 ngày: ', sp('', c(r.trend_from)), '% → ', sp('up', c(r.trend_to)), '% ↗ (', sp('', r.signals_15d), ' lần báo)'); card.appendChild(t);
+    const t2 = document.createElement('div'); t2.className = 'muted';
+    t2.append('Toàn bộ: ', sp('', c(r.rate_200)), '% (', sp('', r.signals_200), ' lần) · ngẫu nhiên ', sp('', c(r.expected)), '%'); card.appendChild(t2);
+    box.appendChild(card);
+  });
+});
+dash.draw('best', (tb) => {
+  const d = dash.data('best');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  const cols = ['method', 'pair', 'source', 'position_rate', 'rate_15d', 'trend', 'signals_15d', 'rate_200', 'expected', 'other_pairs'];
+  const pct = new Set(['position_rate', 'rate_15d', 'rate_200', 'expected']);
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    cols.forEach((c) => {
+      const td = document.createElement('td');
+      const v = r[c];
+      td.textContent = v === '' || v == null ? '–' : (pct.has(c) ? String(v).replace('.', ',') : (c === 'trend' ? (v === 'lên' ? '↗ lên' : v === 'xuống' ? '↘ xuống' : '→ ' + v) : v));
+      if (c === 'pair') { td.style.fontWeight = '600'; if (v === 'Không có') td.style.color = 'var(--color-fg-muted)'; }
+      if (c === 'trend') td.className = v === 'lên' ? 'good' : (v === 'xuống' ? 'bad' : '');
+      if (c === 'source') td.style.textAlign = 'left';
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+dash.draw('today-pair', (el) => {
+  const d = dash.data('best');
+  el.classList.remove('none');
+  if (d.status !== 'ok') { el.textContent = '—'; return; }
+  const r = d.data.find((x) => x.method === window.xsSel);
+  if (!r) { el.textContent = 'Không áp dụng'; el.classList.add('none'); return; }
+  el.textContent = r.pair;
+  if (r.pair === 'Không có') el.classList.add('none');
+});
+
+document.querySelectorAll('.xs .tab').forEach((b) => {
+  b.addEventListener('click', () => {
+    const id = b.getAttribute('data-tab');
+    document.querySelectorAll('.xs .tab').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('.xs .tabpanel').forEach((p) => { p.hidden = p.id !== id; });
+    dash.setLink(id);
+  });
+});
+if (location.hash === '#nhat-ky') document.querySelectorAll('.xs .tab[data-tab="nhat-ky"]').forEach((b) => b.click());
+
+dash.calc('nk_tong', {
+  inputs: ['nhat_ky'],
+  fn: (nhatKy) => {
+    const done = nhatKy.filter((r) => r.result === 'Trúng' || r.result === 'Trượt');
+    const hits = done.filter((r) => r.result === 'Trúng').length;
+    const exp = done.length ? done.reduce((a, r) => a + (+r.expected), 0) / done.length : null;
+    const cnt = (r) => (String(r.pair).includes('–') ? 2 : 1);
+    const nums = done.reduce((a, r) => a + cnt(r), 0);
+    const numHits = done.reduce((a, r) => a + (r.came ? String(r.came).split(',').filter((x) => x.trim()).length : 0), 0);
+    return [{ nums, num_hits: numHits, num_rate: nums ? Math.round((numHits / nums) * 1000) / 10 : null, num_expected: 23.8, scored: done.length, hits, rate: done.length ? Math.round((hits / done.length) * 1000) / 10 : null, expected: exp === null ? null : Math.round(exp * 10) / 10, pending: nhatKy.length - done.length }];
+  },
+});
+[['nk-cn', 'nums'], ['nk-ch', 'num_hits'], ['nk-cr', 'num_rate'], ['nk-ce', 'num_expected'], ['nk-n', 'scored'], ['nk-h', 'hits'], ['nk-r', 'rate'], ['nk-e', 'expected'], ['nk-p', 'pending']].forEach(([name, f]) => {
+  dash.draw(name, (el) => {
+    const d = dash.data('nk_tong');
+    if (d.status !== 'ok' || !d.data || !d.data.length || d.data[0][f] == null) { el.textContent = '—'; return; }
+    el.textContent = String(d.data[0][f]).replace('.', ',');
+  });
+});
+dash.draw('nk-rows', (tb) => {
+  const d = dash.data('nhat_ky');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    ['for_date', 'pair', 'method', 'source_numbers', 'rate_15d', 'result', 'came'].forEach((c) => {
+      const td = document.createElement('td');
+      const v = r[c];
+      td.textContent = c === 'for_date' ? fdate(v) : (v === '' || v == null ? '–' : (c === 'rate_15d' ? String(v).replace('.', ',') : v));
+      if (c === 'pair') td.style.fontWeight = '600';
+      if (c === 'source_numbers' || c === 'method') td.style.textAlign = 'left';
+      if (c === 'result') td.className = v === 'Trúng' ? 'good' : (v === 'Trượt' ? 'bad' : 'pending');
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+dash.calc('nk_cach', {
+  inputs: ['nhat_ky_cach'],
+  fn: (nhatKyCach) => {
+    const order = []; const m = new Map();
+    nhatKyCach.forEach((r) => {
+      if (!m.has(r.method)) { m.set(r.method, { method: r.method, days: 0, silent: 0, pair_hits: 0, nums: 0, num_hits: 0 }); order.push(r.method); }
+      const x = m.get(r.method);
+      if (r.result === 'Không báo') { x.silent += 1; return; }
+      if (r.result !== 'Trúng' && r.result !== 'Trượt') return;
+      x.days += 1;
+      if (r.result === 'Trúng') x.pair_hits += 1;
+      x.nums += String(r.pair).includes('–') ? 2 : 1;
+      x.num_hits += r.came ? String(r.came).split(',').filter((v) => v.trim()).length : 0;
+    });
+    return order.map((k) => { const x = m.get(k); return { ...x, pair_rate: x.days ? Math.round((x.pair_hits / x.days) * 1000) / 10 : null, num_rate: x.nums ? Math.round((x.num_hits / x.nums) * 1000) / 10 : null }; });
+  },
+});
+dash.draw('nk-cach-sum', (tb) => {
+  const d = dash.data('nk_cach');
+  tb.replaceChildren();
+  if (d.status !== 'ok' || !d.data) return;
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    ['method', 'days', 'silent', 'pair_hits', 'pair_rate', 'nums', 'num_hits', 'num_rate'].forEach((c) => {
+      const td = document.createElement('td');
+      const v = r[c];
+      td.textContent = v == null || v === '' ? '–' : String(v).replace('.', ',');
+      if (c === 'num_rate' && v != null) td.className = v - 23.8 >= 10 ? 'good' : (v - 23.8 <= -10 ? 'bad' : '');
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+window.nkPick = undefined;
+window.nkToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+window.nkDays = () => {
+  const d = dash.data('nhat_ky_cach');
+  if (d.status !== 'ok') return [];
+  return Array.from(new Set(d.data.map((r) => r.for_date))).sort().reverse();
+};
+window.nkDay = () => {
+  if (window.nkPick !== undefined) return window.nkPick;
+  const days = window.nkDays(); const t = window.nkToday();
+  return days.includes(t) ? t : (days[0] || '');
+};
+dash.draw('nk-cach-rows', (tb) => {
+  const d = dash.data('nhat_ky_cach');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  const pick = window.nkDay();
+  d.data.filter((r) => !pick || r.for_date === pick).forEach((r) => {
+    const tr = document.createElement('tr');
+    ['for_date', 'method', 'pair', 'source', 'result', 'came'].forEach((c) => {
+      const td = document.createElement('td');
+      const v = r[c];
+      td.textContent = c === 'for_date' ? fdate(v) : (v === '' || v == null ? '–' : v);
+      if (c === 'pair') { td.style.fontWeight = '600'; if (v === 'Không có') { td.style.fontWeight = ''; td.className = 'pending'; } }
+      if (c === 'method' || c === 'source') td.style.textAlign = 'left';
+      if (c === 'result') td.className = v === 'Trúng' ? 'good' : (v === 'Trượt' ? 'bad' : 'pending');
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+dash.draw('nk-ngay', (sel) => {
+  const days = window.nkDays();
+  const t = window.nkToday();
+  sel.replaceChildren(...days.map((v) => new Option(fdate(v) + (v === t ? ' (hôm nay)' : ''), v)), new Option('Tất cả các kỳ', ''));
+  sel.value = window.nkDay();
+  sel.onchange = () => { window.nkPick = sel.value; dash.draw('nk-cach-rows'); };
+});
+</script>
+</body>
+</html>

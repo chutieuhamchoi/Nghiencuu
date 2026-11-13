@@ -1,0 +1,7 @@
+for_date,pair,method,source_numbers,rate_15d,expected,result,came
+2026-11-14,38 – 83,Trùng ≥2 cách,0835 (G5.6),45.5,41.5,Chờ kết quả,
+2026-11-14,57 – 75,Trùng ≥2 cách,75451 (ĐB),45.5,41.5,Chờ kết quả,
+2026-11-13,03 – 30,Cách 3 hoặc 4,30096 (G3.6) dạng ABBXX,42.9,42.0,Trượt,
+2026-11-13,47 – 74,Cách 3 hoặc 4,47709 (G2.1) dạng ABBXX,42.9,42.0,Trượt,
+2026-11-12,68 – 86,Cách 3 hoặc 4,86606 (G3.4) dạng ABBXX,46.2,42.0,Trượt,
+2026-11-12,89 – 98,Cách 3 hoặc 4,9888 (G5.5) dạng ABBB,46.2,42.0,Trúng,89 (1 nháy)
