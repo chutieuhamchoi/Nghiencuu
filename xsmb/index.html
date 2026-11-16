@@ -81,7 +81,7 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
 <script>
 /* Bộ nạp số liệu: đọc các file CSV trong thư mục data/ và vẽ lại các phần của trang. */
 (function () {
-  const files = { series: 'series.csv', summary: 'summary.csv', best: 'best.csv', de_xuat: 'de_xuat.csv', nhat_ky: 'nhat_ky.csv', nhat_ky_cach: 'nhat_ky_cach.csv', states: 'states.csv' };
+  const files = { series: 'series.csv', summary: 'summary.csv', best: 'best.csv', de_xuat: 'de_xuat.csv', nhat_ky: 'nhat_ky.csv', nhat_ky_cach: 'nhat_ky_cach.csv', states: 'states.csv', nuoi_c3: 'nuoi_c3.csv' };
   const store = {}; const calcs = {}; const draws = {};
   const v = Date.now();
   const dash = {
@@ -130,6 +130,7 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
   <div class="tabs" role="tablist" aria-label="Chọn trang">
     <button class="tab" role="tab" id="tab-tong-quan" aria-controls="tong-quan" aria-selected="true" data-tab="tong-quan">Tổng quan</button>
     <button class="tab" role="tab" id="tab-nhat-ky" aria-controls="nhat-ky" aria-selected="false" data-tab="nhat-ky">Nhật ký đề xuất</button>
+    <button class="tab" role="tab" id="tab-nuoi-c3" aria-controls="nuoi-c3" aria-selected="false" data-tab="nuoi-c3">Nuôi Cách 3 (3 ngày)</button>
   </div>
 
   <div class="tabpanel" id="tong-quan" role="tabpanel" aria-labelledby="tab-tong-quan">
@@ -291,6 +292,37 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
         <table aria-label="Nhật ký đề xuất của từng cách">
           <thead><tr><th>Kỳ</th><th>Cách</th><th>Cặp</th><th>Số gốc (vị trí)</th><th>Trạng thái cầu</th><th>Kết quả</th><th>Số về</th></tr></thead>
           <tbody data-draw="nk-cach-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div class="tabpanel" id="nuoi-c3" role="tabpanel" aria-labelledby="tab-nuoi-c3" hidden>
+    <section class="card" id="nc3-dang">
+      <h2>Cặp Cách 3 đang trong khung 3 ngày</h2>
+      <p class="muted">Cách 3: giải 5 chữ số dạng ABBXX (A≠B) báo cặp AB/BA. Mỗi cặp được theo dõi ở 3 kỳ kế tiếp và dừng ở kỳ đầu tiên có về. Chạy thử trên dữ liệu cũ cho thấy cách này gần như ngang ngẫu nhiên ở ngày đầu, nhưng về trong 3 ngày cao hơn ngẫu nhiên; trang này theo dõi tiếp xem điều đó có giữ được trên các kỳ mới không.</p>
+      <div class="pick" data-draw="nc3-active"></div>
+    </section>
+    <section class="card" id="nc3-tong">
+      <h2>Tổng hợp</h2>
+      <div class="tablewrap">
+        <table aria-label="Tổng hợp nuôi Cách 3">
+          <thead><tr><th>Giai đoạn</th><th>Cặp đã xong</th><th>Trúng ngày 1</th><th>Trúng ngày 2</th><th>Trúng ngày 3</th><th>Trượt cả khung</th><th>Về trong 3 ngày</th><th>Ngẫu nhiên</th><th>Số ngày theo</th><th>Tỷ lệ mỗi ngày theo</th><th>Ngẫu nhiên</th></tr></thead>
+          <tbody data-draw="nc3-sum"></tbody>
+        </table>
+      </div>
+      <p class="muted">Đơn vị %. "Chạy thử" là các kỳ có số trước 16/11/2026, chấm lại trên dữ liệu cũ; "Theo dõi mới" là các kỳ từ 16/11/2026 trở đi, mới là phần kiểm chứng thật. "Tỷ lệ mỗi ngày theo" = số cặp trúng chia cho tổng số ngày phải theo (trúng ngày 1 tính 1 ngày, trúng ngày 2 tính 2 ngày, trượt cả khung tính 3 ngày); mức ngẫu nhiên của một cặp mỗi ngày khoảng 42%, về trong 3 ngày khoảng 80,5%. Cần vài chục cặp theo dõi mới thì tỷ lệ mới đáng tin.</p>
+    </section>
+    <section class="card" id="nc3-bang">
+      <h2>Nhật ký từng cặp</h2>
+      <div class="controls">
+        <label for="nc3-loc">Giai đoạn</label>
+        <select class="dash-select" id="nc3-loc" aria-label="Lọc theo giai đoạn"><option value="">Tất cả</option><option value="Theo dõi mới">Theo dõi mới</option><option value="Chạy thử">Chạy thử</option></select>
+      </div>
+      <div class="tablewrap">
+        <table aria-label="Nhật ký nuôi Cách 3">
+          <thead><tr><th>Kỳ có số</th><th>Cặp</th><th>Số gốc (vị trí)</th><th>Ngày 1</th><th>Ngày 2</th><th>Ngày 3</th><th>Kết quả</th><th>Số về</th><th>Giai đoạn</th></tr></thead>
+          <tbody data-draw="nc3-rows"></tbody>
         </table>
       </div>
     </section>
@@ -479,6 +511,64 @@ document.querySelectorAll('.xs .tab').forEach((b) => {
   });
 });
 if (location.hash === '#nhat-ky') document.querySelectorAll('.xs .tab[data-tab="nhat-ky"]').forEach((b) => b.click());
+if (location.hash === '#nuoi-c3') document.querySelectorAll('.xs .tab[data-tab="nuoi-c3"]').forEach((b) => b.click());
+
+const ddmm = (s) => { const p = String(s).split('-'); return p.length === 3 ? p[2] + '/' + p[1] : s; };
+const pctv = (h, n) => (n ? String(Math.round((h / n) * 1000) / 10).replace('.', ',') : '–');
+dash.draw('nc3-active', (box) => {
+  const d = dash.data('nuoi_c3');
+  box.replaceChildren();
+  if (d.status !== 'ok') { box.textContent = '—'; return; }
+  const act = d.data.filter((r) => String(r.result).startsWith('Đang nuôi'));
+  if (!act.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Hiện không có cặp Cách 3 nào đang trong khung 3 ngày.'; box.appendChild(p); return; }
+  act.forEach((r) => {
+    const card = document.createElement('div'); card.className = 'pk';
+    const pair = document.createElement('div'); pair.className = 'pair'; pair.textContent = r.pair; card.appendChild(pair);
+    const a = document.createElement('div'); a.className = 'muted'; a.textContent = 'Số gốc ' + r.source + ' · kỳ ' + ddmm(r.signal_date); card.appendChild(a);
+    const done = [r.d1, r.d2].filter((x) => x).length;
+    const b = document.createElement('div'); b.textContent = 'Ngày ' + (done + 1) + '/3 · theo từ ' + ddmm(r.from_date) + ' đến ' + ddmm(r.to_date); card.appendChild(b);
+    if (done) { const c = document.createElement('div'); c.className = 'muted'; c.textContent = 'Đã qua: ' + [r.d1, r.d2].filter((x) => x).map((x, i) => 'ngày ' + (i + 1) + ' ' + x.toLowerCase()).join(', '); card.appendChild(c); }
+    box.appendChild(card);
+  });
+});
+dash.draw('nc3-sum', (tb) => {
+  const d = dash.data('nuoi_c3');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  ['Theo dõi mới', 'Chạy thử'].forEach((ph) => {
+    const rs = d.data.filter((r) => r.phase === ph && !String(r.result).startsWith('Đang nuôi'));
+    const c = (s) => rs.filter((r) => r.result === s).length;
+    const h1 = c('Trúng ngày 1'), h2 = c('Trúng ngày 2'), h3 = c('Trúng ngày 3'), m = c('Trượt cả khung');
+    const n = rs.length, hit = h1 + h2 + h3, days = h1 + 2 * h2 + 3 * h3 + 3 * m;
+    const tr = document.createElement('tr');
+    [ph, n, h1, h2, h3, m, pctv(hit, n), '80,5', days, pctv(hit, days), '42,0'].forEach((v, i) => {
+      const td = document.createElement('td'); td.textContent = v;
+      if (i === 6 && n) td.className = (hit / n * 100 >= 85.5) ? 'good' : ((hit / n * 100 <= 75.5) ? 'bad' : '');
+      if (i === 9 && days) td.className = (hit / days * 100 >= 47) ? 'good' : ((hit / days * 100 <= 37) ? 'bad' : '');
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+dash.draw('nc3-rows', (tb) => {
+  const d = dash.data('nuoi_c3');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  const sel = (document.getElementById('nc3-loc') || {}).value || '';
+  d.data.filter((r) => !sel || r.phase === sel).forEach((r) => {
+    const tr = document.createElement('tr');
+    [ddmm(r.signal_date), r.pair, r.source, r.d1 || '–', r.d2 || '–', r.d3 || '–', r.result, r.came || '–', r.phase].forEach((v, i) => {
+      const td = document.createElement('td'); td.textContent = v;
+      if (i === 1) td.style.fontWeight = '600';
+      if (i === 2 || i === 6 || i === 8) td.style.textAlign = 'left';
+      if (i >= 3 && i <= 5) td.className = v === 'Về' ? 'good' : (v === '–' ? 'pending' : '');
+      if (i === 6) td.className = String(v).startsWith('Trúng') ? 'good' : (String(v).startsWith('Trượt') ? 'bad' : 'pending');
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+document.querySelectorAll('#nc3-loc').forEach((s) => s.addEventListener('change', () => dash.draw('nc3-rows')));
 
 dash.calc('nk_tong', {
   inputs: ['nhat_ky'],

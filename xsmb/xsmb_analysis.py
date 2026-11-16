@@ -25,7 +25,9 @@ PK = 1 - 0.99 ** 27   # một số kép AA về ít nhất 1 nháy
 WINDOWS = [15, 30, 60]
 TREND_LAG = 5
 MIN_N = 3             # số lần báo tối thiểu trong cửa sổ để vẽ điểm
-GAN_MAX = 10          # lô đã quá số kỳ này chưa về thì bỏ khỏi đề xuất (quy tắc thêm ngày 16/11/2026)
+NUOI_DAYS = 3         # Cách 3: theo dõi trong khung 3 kỳ sau khi báo
+NUOI_START = '2026-11-16'   # kỳ có số từ ngày này trở đi tính là theo dõi mới (trước đó là chạy thử)
+GAN_MAX = 10         # lô đã quá số kỳ này chưa về thì bỏ khỏi đề xuất (quy tắc thêm ngày 16/11/2026)
 METHODS = [  # (mã, tên hiển thị)
     ('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
     ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Pascal ĐB+G1'), ('C9', 'Cách 9 · ABAAX'), ('C10', 'Cách 10 · CABCX'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
@@ -414,6 +416,37 @@ def main(src, outdir):
           [dict(for_date=for_date, method=b['method'], pair=b['pair'], source='' if b['pair'] == 'Không có' else b['source'], state=b['state'],
                 result='Không báo' if b['pair'] == 'Không có' else 'Chờ kết quả', came='') for b in best],
           lambda r: (r['for_date'], r['method']))
+
+    # Theo dõi Cách 3 khung 3 ngày (thêm 16/11/2026): mỗi cặp Cách 3 báo từ kỳ i được theo dõi ở 3 kỳ kế tiếp,
+    # dừng ở kỳ đầu tiên có về. Kỳ có số trước NUOI_START là chạy thử trên dữ liệu cũ; từ NUOI_START là theo dõi mới.
+    nuoi = []
+    for i, r in enumerate(rows):
+        S0 = signals(r)
+        for k in sorted(S0['C3']):
+            days, res_, came, state = [], '', '', ''
+            for d in range(1, NUOI_DAYS + 1):
+                j = i + d
+                if j >= len(rows):
+                    state = f'Đang nuôi (chờ ngày {d})'
+                    break
+                L = lo(rows[j])
+                got = [x for x in sorted({k[0] + k[1], k[1] + k[0]}) if x in L]
+                days.append('Về' if got else 'Trượt')
+                if got:
+                    res_ = f'Trúng ngày {d}'
+                    came = ', '.join(f'{x} ({L.count(x)} nháy)' for x in got)
+                    break
+            if not res_ and not state:
+                res_ = 'Trượt cả khung'
+            first_day = date.fromisoformat(r['Ngay']) + timedelta(days=1)
+            nuoi.append(dict(signal_date=r['Ngay'], from_date=first_day.isoformat(),
+                             to_date=(first_day + timedelta(days=NUOI_DAYS - 1)).isoformat(), pair=fmt_pair(k),
+                             source='; '.join(f'{n} ({c})' for n, c in S0['C3'][k]),
+                             d1=days[0] if len(days) > 0 else '', d2=days[1] if len(days) > 1 else '',
+                             d3=days[2] if len(days) > 2 else '', result=res_ or state, came=came,
+                             phase='Theo dõi mới' if r['Ngay'] >= NUOI_START else 'Chạy thử'))
+    nuoi.sort(key=lambda x: (x['signal_date'], x['pair']), reverse=True)
+    write('nuoi_c3.csv', nuoi, ['signal_date', 'from_date', 'to_date', 'pair', 'source', 'd1', 'd2', 'd3', 'result', 'came', 'phase'])
 
     first, lastd = rows[0]['Ngay'], rows[-1]['Ngay']
     fd = lambda s: date.fromisoformat(s).strftime('%d/%m/%Y')
