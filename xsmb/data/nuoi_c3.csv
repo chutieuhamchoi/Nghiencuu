@@ -1,4 +1,6 @@
 signal_date,from_date,to_date,pair,source,d1,d2,d3,result,came,phase
+2026-11-16,2026-11-17,2026-11-19,24 – 42,42254 (G2.1),,,,Đang nuôi (chờ ngày 1),,Theo dõi mới
+2026-11-16,2026-11-17,2026-11-19,07 – 70,70032 (G3.2),,,,Đang nuôi (chờ ngày 1),,Theo dõi mới
 2026-11-12,2026-11-13,2026-11-15,47 – 74,47709 (G2.1),Trượt,Trượt,Trượt,Trượt cả khung,,Chạy thử
 2026-11-12,2026-11-13,2026-11-15,03 – 30,30096 (G3.6),Trượt,Trượt,Về,Trúng ngày 3,03 (1 nháy),Chạy thử
 2026-11-11,2026-11-12,2026-11-14,68 – 86,86606 (G3.4),Trượt,Về,,Trúng ngày 2,68 (1 nháy),Chạy thử
