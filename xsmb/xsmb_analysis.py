@@ -25,6 +25,7 @@ PK = 1 - 0.99 ** 27   # một số kép AA về ít nhất 1 nháy
 WINDOWS = [15, 30, 60]
 TREND_LAG = 5
 MIN_N = 3             # số lần báo tối thiểu trong cửa sổ để vẽ điểm
+GAN_MAX = 10          # lô đã quá số kỳ này chưa về thì bỏ khỏi đề xuất (quy tắc thêm ngày 16/11/2026)
 METHODS = [  # (mã, tên hiển thị)
     ('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
     ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Pascal ĐB+G1'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
@@ -283,6 +284,7 @@ def main(src, outdir):
     #     rồi đến tỷ lệ về lại của vị trí số gốc;
     #  2) cặp của cách đơn đang ở trạng thái "Đang chạy" (cách có tỷ lệ 15 ngày cao hơn trước);
     #  3) còn thiếu thì lấy theo cách đang đi lên, trên mức ngẫu nhiên, ≥10 lần báo/15 ngày.
+    #  Ở mọi bước đều lọc lô khan (> GAN_MAX kỳ chưa về), xem hàm add() bên dưới.
     state = {b['method']: b['state'] for b in best}
     running = {m for m in SINGLE if state.get(NAME[m]) == 'Đang chạy'}
     agree = defaultdict(list)
@@ -297,9 +299,37 @@ def main(src, outdir):
             pr = sum(prate.get(c, 0) for _, c in src_) / len(src_)
             multi.append((-len(ms), -len(set(ms) & running), -pr, k, ms, src_))
     multi.sort()
+
+    # Quy tắc lô khan: con lô đã quá GAN_MAX kỳ chưa về thì bỏ khỏi đề xuất. Cặp có 1 con khan thì chỉ
+    # đề xuất con còn lại; cả 2 con (hoặc con kép) khan thì bỏ cả cặp và lấy cặp xếp ngay dưới.
+    gan = {}
+    for x in range(100):
+        s = f'{x:02d}'
+        n_gan = 0
+        for r in reversed(rows):
+            if s in lo(r):
+                break
+            n_gan += 1
+        gan[s] = n_gan
     de_xuat = []
-    for _, nrun, _, k, ms, src_ in multi[:2]:
-        de_xuat.append(dict(for_date=for_date, pair=fmt_pair(k),
+    used = set()
+
+    def add(k, rec):
+        if len(de_xuat) >= 2 or k in used:
+            return
+        nums = sorted({k[0] + k[1], k[1] + k[0]})
+        keep = [n for n in nums if gan[n] <= GAN_MAX]
+        drop = [n for n in nums if gan[n] > GAN_MAX]
+        if not keep:
+            return
+        used.add(k)
+        rec['pair'] = fmt_pair(k) if len(keep) == len(nums) else keep[0]
+        if drop:
+            rec['method'] += '; bỏ ' + ', '.join(f'{n} (khan {gan[n]} kỳ)' for n in drop)
+        de_xuat.append(rec)
+
+    for _, nrun, _, k, ms, src_ in multi:
+        add(k, dict(for_date=for_date, pair=fmt_pair(k),
                             method=f'Trùng {len(ms)} cách ({"+".join(x[1:] for x in ms)})' + (f', {-nrun} cách đang chạy' if nrun else ''),
                             source_numbers='; '.join(f'{n} ({c})' for n, c in src_[:3]),
                             trend_from=g['rate_15d_before'], trend_to=g['rate_15d'], rate_15d=g['rate_15d'],
@@ -309,9 +339,7 @@ def main(src, outdir):
                       key=lambda b: -(b['rate_15d'] if b['rate_15d'] != '' else -1))
     for b in run_best:
         for pr, k, src_ in b['_pairs']:
-            if len(de_xuat) >= 2 or fmt_pair(k) in {d['pair'] for d in de_xuat}:
-                continue
-            de_xuat.append(dict(for_date=for_date, pair=fmt_pair(k), method=b['method'] + ' (đang chạy)',
+            add(k, dict(for_date=for_date, pair=fmt_pair(k), method=b['method'] + ' (đang chạy)',
                                 source_numbers='; '.join(f'{n} ({c})' for n, c in src_[:1]),
                                 trend_from=b['rate_15d_before'], trend_to=b['rate_15d'], rate_15d=b['rate_15d'],
                                 signals_15d=b['signals_15d'], rate_200=b['rate_200'], signals_200=b['signals_200'],
@@ -321,16 +349,11 @@ def main(src, outdir):
     ok.sort(key=lambda b: -b['rate_15d'])
     if ok and len(de_xuat) < 2:
         b = ok[0]
-        taken = {d['pair'] for d in de_xuat}
         for pr, k, src_ in b['_pairs']:
-            if len(de_xuat) >= 2:
-                break
-            if fmt_pair(k) in taken:
-                continue
             form = ''
             if b['method'] == 'Cách 3 hoặc 4':
                 form = ' dạng ' + ('ABBXX' if k in S['C3'] else 'ABBB')
-            de_xuat.append(dict(for_date=for_date, pair=fmt_pair(k), method=b['method'],
+            add(k, dict(for_date=for_date, pair=fmt_pair(k), method=b['method'],
                                 source_numbers='; '.join(f'{n} ({c})' for n, c in src_[:1]) + form,
                                 trend_from=b['rate_15d_before'], trend_to=b['rate_15d'], rate_15d=b['rate_15d'],
                                 signals_15d=b['signals_15d'], rate_200=b['rate_200'], signals_200=b['signals_200'],
