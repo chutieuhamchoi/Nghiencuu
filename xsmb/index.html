@@ -155,6 +155,7 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
         <option value="Cách 6 · G7 0AB">Cách 6 · G7 0AB</option>
         <option value="Cách 7 · ĐB XABAX + G1 XXAXX">Cách 7 · ĐB XABAX + G1 XXAXX</option>
         <option value="Cách 8 · Pascal ĐB+G1">Cách 8 · Pascal ĐB+G1</option>
+        <option value="Cách 9 · ABAAX">Cách 9 · ABAAX</option>
         <option value="Trùng ≥3 cách">Trùng ≥3 cách</option>
         <option value="Cách 1+5">Cách 1+5</option>
         <option value="Cách 3+5">Cách 3+5</option>
@@ -211,7 +212,7 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
         <tbody data-draw="table"></tbody>
       </table>
     </div>
-    <p class="muted">Đơn vị là % số lần báo có AB hoặc BA về ở kỳ hôm sau. Mức ngẫu nhiên ≈ 42% với dàn 2 con, ≈ 24% với dàn kép. Các dòng có ít lần báo (Cách 4, Cách 7, Trùng ≥3, 3+4) dao động rất mạnh và không nên đọc đỉnh/đáy của chúng.</p>
+    <p class="muted">Đơn vị là % số lần báo có AB hoặc BA về ở kỳ hôm sau. Mức ngẫu nhiên ≈ 42% với dàn 2 con, ≈ 24% với dàn kép. Các dòng có ít lần báo (Cách 4, Cách 7, Cách 9, Trùng ≥3, 3+4) dao động rất mạnh và không nên đọc đỉnh/đáy của chúng.</p>
   </section>
 
   </div>
@@ -296,7 +297,7 @@ select.dash-select { font: inherit; font-size: var(--cds-font-size-body); paddin
 
   <details id="cach-tinh">
     <summary>Cách tính và nguồn số liệu</summary>
-    <p>Nguồn: xskt.com.vn. Các kỳ từ 22/08/2026 trở đi đã đối chiếu khớp 100% với bảng đầu–đuôi; các kỳ 26/04–21/08 trích từ trang 200 ngày, chưa đối chiếu từng kỳ. Cách 1: số 4–5 chữ số bắt đầu bằng 0 (0AB…). Cách 2: số 5 chữ số có chữ số thứ hai là 0 (X0AB…). Cách 3: số 5 chữ số dạng ABBXX, A≠B. Cách 4: số dạng ABBB…, A≠B. Cách 5: từ 2 số 4–5 chữ số trở lên trong cùng kỳ mở đầu bằng AB hoặc BA. Cách 6: viết 4 số giải 7 liền nhau thành dãy 8 chữ số, mỗi chỗ có dạng 0AB (số 0 rồi hai chữ số kế tiếp) báo cặp AB/BA. Cách 7: giải đặc biệt dạng XABAX (chữ số thứ 2 và thứ 4 cùng là A, chữ số thứ 3 là B) và giải nhất dạng XXAXX (chữ số giữa là A) thì báo cặp AB/BA; cách này rất hiếm. Cách 8 (Pascal): ghép 5 số giải đặc biệt và 5 số giải nhất thành dãy 10 chữ số, cộng từng cặp chữ số liền nhau và chỉ lấy hàng đơn vị, lặp lại đến khi còn 2 chữ số AB, báo cặp AB/BA; mỗi ngày báo đúng 1 cặp. Các tổ hợp "Trùng ≥2 cách" và "Trùng ≥3 cách" tính cả Cách 6 và Cách 7, không tính Cách 8. "Trúng" là AB hoặc BA về ít nhất 1 nháy ở kỳ ngay sau. Vùng 95% là mức ngẫu nhiên ± 1,96 độ lệch chuẩn theo số lần báo trong cửa sổ đang chọn. Số liệu được tính lại tự động mỗi tối sau giờ quay; mã tính toán: <code>xsmb_analysis.py</code> trong cùng thư mục.</p>
+    <p>Nguồn: xskt.com.vn. Các kỳ từ 22/08/2026 trở đi đã đối chiếu khớp 100% với bảng đầu–đuôi; các kỳ 26/04–21/08 trích từ trang 200 ngày, chưa đối chiếu từng kỳ. Cách 1: số 4–5 chữ số bắt đầu bằng 0 (0AB…). Cách 2: số 5 chữ số có chữ số thứ hai là 0 (X0AB…). Cách 3: số 5 chữ số dạng ABBXX, A≠B. Cách 4: số dạng ABBB…, A≠B. Cách 5: từ 2 số 4–5 chữ số trở lên trong cùng kỳ mở đầu bằng AB hoặc BA. Cách 6: viết 4 số giải 7 liền nhau thành dãy 8 chữ số, mỗi chỗ có dạng 0AB (số 0 rồi hai chữ số kế tiếp) báo cặp AB/BA. Cách 7: giải đặc biệt dạng XABAX (chữ số thứ 2 và thứ 4 cùng là A, chữ số thứ 3 là B) và giải nhất dạng XXAXX (chữ số giữa là A) thì báo cặp AB/BA; cách này rất hiếm. Cách 8 (Pascal): ghép 5 số giải đặc biệt và 5 số giải nhất thành dãy 10 chữ số, cộng từng cặp chữ số liền nhau và chỉ lấy hàng đơn vị, lặp lại đến khi còn 2 chữ số AB, báo cặp AB/BA; mỗi ngày báo đúng 1 cặp. Cách 9: số 5 chữ số dạng ABAAX (chữ số thứ 1, 3, 4 cùng là A, chữ số thứ 2 là B, A≠B), ví dụ 32334 báo cặp 32/23; cách này hiếm. Các tổ hợp "Trùng ≥2 cách" và "Trùng ≥3 cách" tính cả Cách 6, Cách 7 và Cách 9, không tính Cách 8. Khi chọn 2 cặp đề xuất, con lô đã quá 10 kỳ chưa về bị bỏ (cặp còn 1 con thì đề xuất con còn lại; cả 2 con khan thì lấy cặp xếp dưới). "Trúng" là AB hoặc BA về ít nhất 1 nháy ở kỳ ngay sau. Vùng 95% là mức ngẫu nhiên ± 1,96 độ lệch chuẩn theo số lần báo trong cửa sổ đang chọn. Số liệu được tính lại tự động mỗi tối sau giờ quay; mã tính toán: <code>xsmb_analysis.py</code> trong cùng thư mục.</p>
   </details>
 </div>
 </div>

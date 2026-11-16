@@ -28,14 +28,14 @@ MIN_N = 3             # số lần báo tối thiểu trong cửa sổ để v�
 GAN_MAX = 10          # lô đã quá số kỳ này chưa về thì bỏ khỏi đề xuất (quy tắc thêm ngày 16/11/2026)
 METHODS = [  # (mã, tên hiển thị)
     ('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
-    ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Pascal ĐB+G1'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
+    ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Pascal ĐB+G1'), ('C9', 'Cách 9 · ABAAX'), ('>=2', 'Trùng ≥2 cách'), ('>=3', 'Trùng ≥3 cách'),
     ('1+5', 'Cách 1+5'), ('3+5', 'Cách 3+5'), ('3+4', 'Cách 3+4'), ('RND', 'Đối chứng · 6 cặp ngẫu nhiên/ngày'),
 ]
 BEST = [('C1', 'Cách 1 · 0AB…'), ('C2', 'Cách 2 · X0AB…'), ('C3', 'Cách 3 · ABBXX'), ('C4', 'Cách 4 · ABBB…'),
-        ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Pascal ĐB+G1'), ('>=2', 'Trùng ≥2 cách'), ('1+5', 'Cách 1+5'),
+        ('C5', 'Cách 5 · AB/BA lặp ≥2'), ('C6', 'Cách 6 · G7 0AB'), ('C7', 'Cách 7 · ĐB XABAX + G1 XXAXX'), ('C8', 'Cách 8 · Pascal ĐB+G1'), ('C9', 'Cách 9 · ABAAX'), ('>=2', 'Trùng ≥2 cách'), ('1+5', 'Cách 1+5'),
         ('3+5', 'Cách 3+5'), ('3+4', 'Cách 3+4'), ('3|4', 'Cách 3 hoặc 4')]
 NAME = dict(METHODS + BEST)
-SINGLE = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']
+SINGLE = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C9']
 
 
 def key(a, b):
@@ -69,6 +69,9 @@ def signals(r):
             S['C3'][key(n[0], n[1])].append((n, c))
         if L in (4, 5) and n[1] == n[2] == n[3] and n[0] != n[1]:
             S['C4'][key(n[0], n[1])].append((n, c))
+        # Cách 9 (thêm 16/11/2026): số 5 chữ số dạng ABAAX (chữ số 1 = 3 = 4 = A, chữ số 2 = B, A≠B) → AB/BA
+        if L == 5 and n[0] == n[2] == n[3] and n[0] != n[1]:
+            S['C9'][key(n[0], n[1])].append((n, c))
     head = defaultdict(list)
     for c, n in nums:
         if len(n) in (4, 5):
