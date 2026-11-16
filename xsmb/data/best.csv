@@ -3,12 +3,13 @@ for_date,method,pair,source,position_rate,other_pairs,state,last5,rate_15d,rate_
 2026-11-16,Cách 2 · X0AB…,Không có,Kỳ 15/11 không có số khớp,,,Đang chạy,✗✓✓✓✓,22.7,12.5,lên,22,40.7,214,40.8
 2026-11-16,Cách 3 · ABBXX,Không có,Kỳ 15/11 không có số khớp,,,Trượt 3 kỳ liền,✓✗✗✗✗,16.7,40.0,xuống,12,43.6,172,42.0
 2026-11-16,Cách 4 · ABBB…,Không có,Kỳ 15/11 không có số khớp,,,Đang chạy,✓✗✓✓✓,75.0,75.0,đi ngang,4,55.0,40,42.0
-2026-11-16,Cách 5 · AB/BA lặp ≥2,38 – 83,83438 (G1); 38697 (G3.6),46.7,"16, 57",Đang chạy,✗✗✗✓✓,35.6,41.9,xuống,45,39.8,578,40.7
+2026-11-16,Cách 5 · AB/BA lặp ≥2,38 – 83,83438 (G1); 38697 (G3.6),47.3,"16, 57",Đang chạy,✗✗✗✓✓,35.6,41.9,xuống,45,39.8,578,40.7
 2026-11-16,Cách 6 · G7 0AB,Không có,Kỳ 15/11 không có số khớp,,,Vừa trượt,✓✓✗✓✗,40.0,62.5,xuống,10,48.7,119,40.8
 2026-11-16,Cách 7 · ĐB XABAX + G1 XXAXX,Không có,Kỳ 15/11 không có số khớp,,,Vừa trượt,✗✓✗,0.0,,đi ngang,1,33.3,3,36.0
 2026-11-16,Cách 8 · Pascal ĐB+G1,59 – 95,61225 + 83438 (ĐB),38.2,,Vừa trượt,✗✓✓✗✗,46.7,33.3,lên,15,42.4,203,40.2
 2026-11-16,Cách 9 · ABAAX,Không có,Kỳ 15/11 không có số khớp,,,Đang chạy,✓✗✗✓✓,100.0,100.0,đi ngang,2,57.1,14,42.0
-2026-11-16,Trùng ≥2 cách,Không có,Kỳ 15/11 không có số khớp,,,Đang chạy,✗✓✓✓✓,46.2,50.0,xuống,13,51.0,143,41.5
+2026-11-16,Cách 10 · CABCX,Không có,Kỳ 15/11 không có số khớp,,,Đang chạy,✓✗✓✓✓,70.0,50.0,lên,10,50.6,180,42.0
+2026-11-16,Trùng ≥2 cách,Không có,Kỳ 15/11 không có số khớp,,,Đang chạy,✓✓✓✓✓,53.3,50.0,lên,15,48.9,182,41.6
 2026-11-16,Cách 1+5,Không có,Kỳ 15/11 không có số khớp,,,Đang chạy,✓✗✓✓✓,80.0,60.0,lên,5,45.2,42,40.7
 2026-11-16,Cách 3+5,Không có,Kỳ 15/11 không có số khớp,,,Vừa trượt,✗✗✓✗✗,0.0,33.3,xuống,2,45.8,48,42.0
 2026-11-16,Cách 3+4,Không có,Kỳ 15/11 không có số khớp,,,Vừa gãy,✗✓✓✓✗,0.0,0.0,đi ngang,1,44.4,18,42.0
