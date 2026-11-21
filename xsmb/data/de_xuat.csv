@@ -1,3 +1,2 @@
 for_date,pair,method,source_numbers,trend_from,trend_to,rate_15d,signals_15d,rate_200,signals_200,expected
-2026-11-21,34 – 43,Cách 5 · AB/BA lặp ≥2 (đang chạy),34387 (G1),35.6,34.8,34.8,46,39.7,595,40.8
-2026-11-21,35 – 53,Cách 8 · Pascal ĐB+G1,10760 + 34387 (ĐB),46.7,53.3,53.3,15,42.8,208,40.2
+2026-11-22,68 – 86,Trùng 2 cách (1+10),06804 (ĐB),53.3,60.0,60.0,15,49.2,189,41.7

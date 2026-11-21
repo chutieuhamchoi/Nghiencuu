@@ -1,6 +1,7 @@
 for_date,pair,method,source_numbers,rate_15d,expected,result,came
-2026-11-21,34 – 43,Cách 5 · AB/BA lặp ≥2 (đang chạy),34387 (G1),34.8,40.8,Chờ kết quả,
-2026-11-21,35 – 53,Cách 8 · Pascal ĐB+G1,10760 + 34387 (ĐB),53.3,40.2,Chờ kết quả,
+2026-11-22,68 – 86,Trùng 2 cách (1+10),06804 (ĐB),60.0,41.7,Chờ kết quả,
+2026-11-21,34 – 43,Cách 5 · AB/BA lặp ≥2 (đang chạy),34387 (G1),34.8,40.8,Trượt,
+2026-11-21,35 – 53,Cách 8 · Pascal ĐB+G1,10760 + 34387 (ĐB),53.3,40.2,Trượt,
 2026-11-20,12,"Trùng 2 cách (3+5), 1 cách đang chạy; bỏ 21 (khan 24 kỳ)",12262 (G1); 2196 (G5.4),64.3,41.7,Trượt,
 2026-11-20,67 – 76,Cách 5 · AB/BA lặp ≥2 (đang chạy),76943 (G2.2),37.0,40.7,Trượt,
 2026-11-19,03,"Trùng 2 cách (4+5), 2 cách đang chạy; bỏ 30 (khan 13 kỳ)",3000 (G5.3); 30414 (G2.2),57.1,41.7,Trượt,
