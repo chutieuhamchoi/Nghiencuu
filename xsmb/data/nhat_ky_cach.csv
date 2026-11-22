@@ -1,15 +1,30 @@
 for_date,method,pair,source,state,result,came
-2026-11-22,Cách 1 · 0AB…,46 – 64,0463 (G5.2),Vừa trượt,Chờ kết quả,
-2026-11-22,Cách 2 · X0AB…,59 – 95,30591 (G3.3),Vừa chạy lại,Chờ kết quả,
+2026-11-23,Cách 1 · 0AB…,08 – 80,0808 (G4.1),Vừa chạy lại,Chờ kết quả,
+2026-11-23,Cách 2 · X0AB…,Không có,,Đang chạy,Không báo,
+2026-11-23,Cách 3 · ABBXX,29 – 92,92286 (ĐB),Vừa trượt,Chờ kết quả,
+2026-11-23,Cách 4 · ABBB…,Không có,,Vừa gãy,Không báo,
+2026-11-23,Cách 5 · AB/BA lặp ≥2,08 – 80,08621 (G1); 0808 (G4.1),Vừa chạy lại,Chờ kết quả,
+2026-11-23,Cách 6 · G7 0AB,Không có,,Trượt 3 kỳ liền,Không báo,
+2026-11-23,Cách 7 · ĐB XABAX + G1 XXAXX,Không có,,Vừa trượt,Không báo,
+2026-11-23,Cách 8 · Pascal ĐB+G1,13 – 31,92286 + 08621 (ĐB),Vừa chạy lại,Chờ kết quả,
+2026-11-23,Cách 9 · ABAAX,Không có,,Đang chạy,Không báo,
+2026-11-23,Cách 10 · CABCX,Không có,,Vừa chạy lại,Không báo,
+2026-11-23,Trùng ≥2 cách,08 – 80,0808 (G4.1); 08621 (G1),Vừa chạy lại,Chờ kết quả,
+2026-11-23,Cách 1+5,08 – 80,0808 (G4.1); 08621 (G1),Đang chạy,Chờ kết quả,
+2026-11-23,Cách 3+5,Không có,,Vừa gãy,Không báo,
+2026-11-23,Cách 3+4,Không có,,Vừa gãy,Không báo,
+2026-11-23,Cách 3 hoặc 4,29 – 92,02961 (G3.2); 02991 (G3.6); 92286 (ĐB),Vừa trượt,Chờ kết quả,
+2026-11-22,Cách 1 · 0AB…,46 – 64,0463 (G5.2),Vừa trượt,Trúng,64 (1 nháy)
+2026-11-22,Cách 2 · X0AB…,59 – 95,30591 (G3.3),Vừa chạy lại,Trúng,59 (1 nháy)
 2026-11-22,Cách 3 · ABBXX,Không có,,Vừa trượt,Không báo,
 2026-11-22,Cách 4 · ABBB…,Không có,,Vừa gãy,Không báo,
-2026-11-22,Cách 5 · AB/BA lặp ≥2,04 – 40,0463 (G5.2); 0475 (G5.3),Vừa gãy,Chờ kết quả,
-2026-11-22,Cách 6 · G7 0AB,45 – 54,56 04 57 11 (G7),Vừa trượt,Chờ kết quả,
+2026-11-22,Cách 5 · AB/BA lặp ≥2,04 – 40,0463 (G5.2); 0475 (G5.3),Vừa gãy,Trúng,04 (1 nháy)
+2026-11-22,Cách 6 · G7 0AB,45 – 54,56 04 57 11 (G7),Vừa trượt,Trượt,
 2026-11-22,Cách 7 · ĐB XABAX + G1 XXAXX,Không có,,Vừa trượt,Không báo,
-2026-11-22,Cách 8 · Pascal ĐB+G1,08 – 80,06804 + 37886 (ĐB),Vừa trượt,Chờ kết quả,
+2026-11-22,Cách 8 · Pascal ĐB+G1,08 – 80,06804 + 37886 (ĐB),Vừa trượt,Trúng,08 (3 nháy)
 2026-11-22,Cách 9 · ABAAX,Không có,,Đang chạy,Không báo,
-2026-11-22,Cách 10 · CABCX,68 – 86,06804 (ĐB),Vừa gãy,Chờ kết quả,
-2026-11-22,Trùng ≥2 cách,68 – 86,06804 (ĐB),Vừa gãy,Chờ kết quả,
+2026-11-22,Cách 10 · CABCX,68 – 86,06804 (ĐB),Vừa gãy,Trúng,86 (1 nháy)
+2026-11-22,Trùng ≥2 cách,68 – 86,06804 (ĐB),Vừa gãy,Trúng,86 (1 nháy)
 2026-11-22,Cách 1+5,Không có,,Đang chạy,Không báo,
 2026-11-22,Cách 3+5,Không có,,Vừa gãy,Không báo,
 2026-11-22,Cách 3+4,Không có,,Vừa gãy,Không báo,
