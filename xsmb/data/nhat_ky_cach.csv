@@ -1,19 +1,34 @@
 for_date,method,pair,source,state,result,came
-2026-11-27,Cách 1 · 0AB…,69 – 96,09621 (ĐB),Đang chạy,Chờ kết quả,
-2026-11-27,Cách 2 · X0AB…,13 – 31,40137 (G3.5),Đang chạy,Chờ kết quả,
-2026-11-27,Cách 3 · ABBXX,56 – 65,65528 (G3.4),Vừa trượt,Chờ kết quả,
+2026-11-28,Cách 1 · 0AB…,36 – 63,03636 (G3.1); 06339 (G3.3),Vừa gãy,Chờ kết quả,
+2026-11-28,Cách 2 · X0AB…,Không có,,Vừa gãy,Không báo,
+2026-11-28,Cách 3 · ABBXX,47 – 74,47771 (G2.2),Vừa chạy lại,Chờ kết quả,
+2026-11-28,Cách 4 · ABBB…,47 – 74,47771 (G2.2),Vừa trượt,Chờ kết quả,
+2026-11-28,Cách 5 · AB/BA lặp ≥2,38 – 83,83567 (G3.6); 3899 (G5.5),Đang chạy,Chờ kết quả,
+2026-11-28,Cách 6 · G7 0AB,15 – 51,01 50 83 56 (G7),Vừa trượt,Chờ kết quả,
+2026-11-28,Cách 7 · ĐB XABAX + G1 XXAXX,Không có,,Vừa trượt,Không báo,
+2026-11-28,Cách 8 · Pascal ĐB+G1,03 – 30,75334 + 98392 (ĐB),Đang chạy,Chờ kết quả,
+2026-11-28,Cách 9 · ABAAX,Không có,,Vừa gãy,Không báo,
+2026-11-28,Cách 10 · CABCX,38 – 83,98392 (G1),Vừa chạy lại,Chờ kết quả,
+2026-11-28,Trùng ≥2 cách,47 – 74,47771 (G2.2),Đang chạy,Chờ kết quả,
+2026-11-28,Cách 1+5,Không có,,Vừa trượt,Không báo,
+2026-11-28,Cách 3+5,Không có,,Vừa chạy lại,Không báo,
+2026-11-28,Cách 3+4,47 – 74,47771 (G2.2),Vừa trượt,Chờ kết quả,
+2026-11-28,Cách 3 hoặc 4,47 – 74,47771 (G2.2),Vừa chạy lại,Chờ kết quả,
+2026-11-27,Cách 1 · 0AB…,69 – 96,09621 (ĐB),Đang chạy,Trượt,
+2026-11-27,Cách 2 · X0AB…,13 – 31,40137 (G3.5),Đang chạy,Trượt,
+2026-11-27,Cách 3 · ABBXX,56 – 65,65528 (G3.4),Vừa trượt,Trúng,56 (1 nháy)
 2026-11-27,Cách 4 · ABBB…,Không có,,Vừa trượt,Không báo,
-2026-11-27,Cách 5 · AB/BA lặp ≥2,56 – 65,65528 (G3.4); 5651 (G5.5),Đang chạy,Chờ kết quả,
+2026-11-27,Cách 5 · AB/BA lặp ≥2,56 – 65,65528 (G3.4); 5651 (G5.5),Đang chạy,Trúng,56 (1 nháy)
 2026-11-27,Cách 6 · G7 0AB,Không có,,Vừa trượt,Không báo,
 2026-11-27,Cách 7 · ĐB XABAX + G1 XXAXX,Không có,,Vừa trượt,Không báo,
-2026-11-27,Cách 8 · Pascal ĐB+G1,29 – 92,09621 + 94511 (ĐB),Đang chạy,Chờ kết quả,
+2026-11-27,Cách 8 · Pascal ĐB+G1,29 – 92,09621 + 94511 (ĐB),Đang chạy,Trúng,92 (1 nháy)
 2026-11-27,Cách 9 · ABAAX,Không có,,Vừa gãy,Không báo,
 2026-11-27,Cách 10 · CABCX,Không có,,Vừa chạy lại,Không báo,
-2026-11-27,Trùng ≥2 cách,56 – 65,65528 (G3.4); 5651 (G5.5),Vừa chạy lại,Chờ kết quả,
+2026-11-27,Trùng ≥2 cách,56 – 65,65528 (G3.4); 5651 (G5.5),Vừa chạy lại,Trúng,56 (1 nháy)
 2026-11-27,Cách 1+5,Không có,,Vừa trượt,Không báo,
-2026-11-27,Cách 3+5,56 – 65,65528 (G3.4); 5651 (G5.5),Vừa trượt,Chờ kết quả,
+2026-11-27,Cách 3+5,56 – 65,65528 (G3.4); 5651 (G5.5),Vừa trượt,Trúng,56 (1 nháy)
 2026-11-27,Cách 3+4,Không có,,Vừa trượt,Không báo,
-2026-11-27,Cách 3 hoặc 4,56 – 65,65528 (G3.4); 5651 (G5.5),Vừa trượt,Chờ kết quả,
+2026-11-27,Cách 3 hoặc 4,56 – 65,65528 (G3.4); 5651 (G5.5),Vừa trượt,Trúng,56 (1 nháy)
 2026-11-26,Cách 1 · 0AB…,45 – 54,0455 (G4.3),Đang chạy,Trúng,54 (1 nháy)
 2026-11-26,Cách 2 · X0AB…,29 – 92,10925 (G3.3),Vừa chạy lại,Trúng,29 (1 nháy)
 2026-11-26,Cách 3 · ABBXX,57 – 75,75550 (G2.1),Vừa chạy lại,Trượt,
